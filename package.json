@@ -1,0 +1,38 @@
+{
+    "name": "typeful-redux",
+    "version": "0.0.1",
+    "description": "A typesafe and low-boilerplate way to create redux actions, reducers and stores",
+    "main": "dist/typeful-redux.js",
+    "types": "dist/typeful-redux.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/paulkoerbitz/typeful-redux.git"
+    },
+    "keywords": [
+        "redux",
+        "react",
+        "typesafe",
+        "typescript",
+        "reducer"
+    ],
+    "author": "Paul Koerbitz",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/paulkoerbitz/typeful-redux/issues"
+    },
+    "homepage": "https://github.com/paulkoerbitz/typeful-redux#readme",
+    "devDependencies": {
+        "@types/chai": "^4.0.4",
+        "@types/mocha": "^2.2.44",
+        "@types/redux": "^3.6.0",
+        "chai": "^4.1.2",
+        "mocha": "^4.0.1",
+        "redux": "^3.7.2",
+        "ts-node": "^3.3.0",
+        "typescript": "^2.6.1"
+    },
+    "scripts": {
+        "build": "tsc",
+        "test": "mocha --require ts-node/register --watch-extensions ts,tsx \"test/**/*.ts\""
+    }
+}
