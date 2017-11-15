@@ -1,5 +1,5 @@
 import { createStore, applyMiddleware, combineReducers } from 'redux';
-// import { connect as redux_connect } from 'react-redux';
+import { connect as redux_connect } from 'react-redux';
 
 // TODO
 //  1. ~~~fix store type signature (right now only the first 'state' is available from 'getState')~~~
@@ -31,10 +31,10 @@ export type BasicStore<S>  = {
 export type Dispatch0<K extends string> = {
     [k in K]: { (): void; get(): { type: string } }
 };
-export type Dispatch<K extends string, P> = {
+export type Dispatch1<K extends string, P> = {
     [k in K]: { (x: P): void; get(payload: P): { type: string; payload: P } }
 };
-export type Handler0<S, K extends string> = {
+export type Setter<S, K extends string> = {
     [k in K]: (x1: S) => void
 };
 export type Handler<S, K extends string, P> = {
@@ -44,17 +44,18 @@ export type Handler<S, K extends string, P> = {
 export class ReducerBuilder<S, X = {}, Y = {}> {
     private initial: S;
     private reducer: {};
-    constructor(initial: S) {
+    public __dispatchType: Y = undefined as any;
+    public constructor(initial: S) {
         this.initial = initial;
         this.reducer = {};
     }
-    public addSetter<K extends string>(name: K, handler: (state: S) => S): ReducerBuilder<S, X & Handler0<S, K>, Y & Dispatch0<K>> {
-        const result = new ReducerBuilder<S, X & Handler0<S, K>, Y & Dispatch0<K>>(this.initial);
+    public addSetter<K extends string>(name: K, handler: (state: S) => S): ReducerBuilder<S, X & Setter<S, K>, Y & Dispatch0<K>> {
+        const result = new ReducerBuilder<S, X & Setter<S, K>, Y & Dispatch0<K>>(this.initial);
         result.reducer = { ...this.reducer, [name]: handler };
         return result;
     }
-    public addHandler<K extends string, P>(name: K, handler: (state: S, payload: P) => S): ReducerBuilder<S, X & Handler<S, K, P>, Y & Dispatch<K, P>> {
-        const result = new ReducerBuilder<S, X & Handler<S, K, P>, Y & Dispatch<K, P>>(this.initial);
+    public addHandler<K extends string, P>(name: K, handler: (state: S, payload: P) => S): ReducerBuilder<S, X & Handler<S, K, P>, Y & Dispatch1<K, P>> {
+        const result = new ReducerBuilder<S, X & Handler<S, K, P>, Y & Dispatch1<K, P>>(this.initial);
         result.reducer = { ...this.reducer, [name]: handler };
         return result;
     }
@@ -168,6 +169,29 @@ export class StoreBuilder<X = {}, Y = (action: { type: string; payload: any }) =
         return result;
     }
 }
+
+/*
+ * strongly typed connect
+ */
+
+export interface MapStateToProps<STATE, OWN_PROPS, PROPS_FROM_STATE> {
+    (state: STATE, ownProps: OWN_PROPS): PROPS_FROM_STATE;
+}
+
+export interface MapDispatchToProps<DISPATCH, OWN_PROPS, PROPS_FROM_DISPATCH> {
+    (dispatch: DISPATCH, ownProps: OWN_PROPS): PROPS_FROM_DISPATCH;
+}
+
+export interface Connect {
+    <STATE, DISPATCH, OWN_PROPS, PROPS_FROM_STATE, PROPS_FROM_DISPATCH>(
+        mapStateToProps: MapStateToProps<STATE, OWN_PROPS, PROPS_FROM_STATE>,
+        mapDispatchToProps: MapDispatchToProps<DISPATCH, OWN_PROPS, PROPS_FROM_DISPATCH>
+    ): (Component: React.ComponentType<PROPS_FROM_STATE & PROPS_FROM_DISPATCH>)
+        => React.ComponentType<OWN_PROPS>;
+}
+
+export const connect: Connect = redux_connect;
+
 
 /*
 interface UserInfo {

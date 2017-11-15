@@ -21,13 +21,17 @@
         "url": "https://github.com/paulkoerbitz/typeful-redux/issues"
     },
     "homepage": "https://github.com/paulkoerbitz/typeful-redux#readme",
+    "peerDependencies": {
+        "react-redux": "5.x",
+        "redux": "^3.x"
+    },
     "devDependencies": {
         "@types/chai": "^4.0.4",
         "@types/mocha": "^2.2.44",
+        "@types/react-redux": "^5.0.12",
         "@types/redux": "^3.6.0",
         "chai": "^4.1.2",
         "mocha": "^4.0.1",
-        "redux": "^3.7.2",
         "ts-node": "^3.3.0",
         "typescript": "^2.6.1"
     },
