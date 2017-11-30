@@ -24,15 +24,17 @@ import { connect as redux_connect } from 'react-redux';
 // 12. give talk(s)
 
 
-export type BasicStore<S>  = {
-    getState(): S;
+export type Store<STATE, DISPATCH> = {
+    getState(): STATE;
     subscribe(cb: () => void): () => void;
-}
+    dispatch: DISPATCH;
+};
+
 export type Dispatch0<K extends string> = {
-    [k in K]: { (): void; get(): { type: string } }
+    [k in K]: { (): void; }
 };
 export type Dispatch1<K extends string, P> = {
-    [k in K]: { (x: P): void; get(payload: P): { type: string; payload: P } }
+    [k in K]: { (x: P): void; }
 };
 export type Setter<S, K extends string> = {
     [k in K]: (x1: S) => void
@@ -83,13 +85,13 @@ export class StoreBuilder<X = {}, Y = (action: { type: string; payload: any }) =
         result.middlewares = [...this.middlewares, middleware];
         return result;
     }
-    public build(): BasicStore<X> & { dispatch: Y } {
+    public build(): Store<X, Y> {
         const { reducers, dispatchFunctionsFactory } = this.buildReducers();
         const store = createStore(
             reducers,
             this.buildInitialState(),
             this.buildMiddleware()
-        ) as any as BasicStore<X> & { dispatch: Y };
+        ) as any as Store<X, Y>;
         (store as any).dispatch = dispatchFunctionsFactory(store);
         return store;
     }
@@ -183,11 +185,10 @@ export interface MapDispatchToProps<DISPATCH, OWN_PROPS, PROPS_FROM_DISPATCH> {
 }
 
 export interface Connect {
-    <STATE, DISPATCH, OWN_PROPS, PROPS_FROM_STATE, PROPS_FROM_DISPATCH>(
+    <STATE, DISPATCH, OWN_PROPS extends Store<STATE, DISPATCH>, PROPS_FROM_STATE, PROPS_FROM_DISPATCH>(
         mapStateToProps: MapStateToProps<STATE, OWN_PROPS, PROPS_FROM_STATE>,
         mapDispatchToProps: MapDispatchToProps<DISPATCH, OWN_PROPS, PROPS_FROM_DISPATCH>
-    ): (Component: React.ComponentType<PROPS_FROM_STATE & PROPS_FROM_DISPATCH>)
-        => React.ComponentType<OWN_PROPS>;
+    ): (component: React.ComponentClass<PROPS_FROM_STATE & PROPS_FROM_DISPATCH>) => React.ComponentClass<OWN_PROPS & Store<STATE, DISPATCH>>;
 }
 
 export const connect: Connect = redux_connect;

@@ -45,17 +45,5 @@ describe('StoreBuilder', () => {
             expect(store.getState().counter).to.equal(-2);
 
         });
-
-        it('actions have a type `prefix`/`action_name`', () => {
-            const reducer = new ReducerBuilder(0).addSetter(
-                'increment', s => s + 1
-            ).addSetter(
-                'decrement', s => s - 1
-            );
-            const store = new StoreBuilder().addReducer('counter', reducer).build();
-
-            expect(store.dispatch.counter.increment.get().type).to.equal("counter/increment");
-            expect(store.dispatch.counter.decrement.get().type).to.equal("counter/decrement");
-        });
     });
 });
