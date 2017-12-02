@@ -70,7 +70,7 @@ export class ReducerBuilder<S, X = {}, Y = {}> {
 }
 
 export type Reducer<S, X = {}, Y = {}> = {
-    <K extends string>(name: K, handler: (state: S) => S): ReducerBuilder<S, X & Setter<S, K>, Y & Dispatch0<K>>;
+    <K extends string>(name: K, handler: (state: S) => S): Reducer<S, X & Setter<S, K>, Y & Dispatch0<K>>;
     <K extends string, P>(name: K, handler: (state: S, payload: P) => S): Reducer<S, X & Handler<S, K, P>, Y & Dispatch1<K, P>>;
     __dispatchType: Y;
     getInitial(): S;
@@ -204,10 +204,10 @@ export interface MapDispatchToProps<DISPATCH, OWN_PROPS, PROPS_FROM_DISPATCH> {
 }
 
 export interface Connect {
-    <STATE, DISPATCH, OWN_PROPS extends Store<STATE, DISPATCH>, PROPS_FROM_STATE, PROPS_FROM_DISPATCH>(
+    <STATE, DISPATCH, OWN_PROPS extends { store: Store<STATE, DISPATCH>; }, PROPS_FROM_STATE, PROPS_FROM_DISPATCH>(
         mapStateToProps: MapStateToProps<STATE, OWN_PROPS, PROPS_FROM_STATE>,
         mapDispatchToProps: MapDispatchToProps<DISPATCH, OWN_PROPS, PROPS_FROM_DISPATCH>
-    ): (component: React.ComponentClass<PROPS_FROM_STATE & PROPS_FROM_DISPATCH>) => React.ComponentClass<OWN_PROPS & Store<STATE, DISPATCH>>;
+    ): (component: React.ComponentClass<PROPS_FROM_STATE & PROPS_FROM_DISPATCH>) => React.ComponentClass<OWN_PROPS & { store: Store<STATE, DISPATCH>; }>;
 }
 
 export const connect: Connect = redux_connect;
