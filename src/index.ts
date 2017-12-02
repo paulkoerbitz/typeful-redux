@@ -69,10 +69,29 @@ export class ReducerBuilder<S, X = {}, Y = {}> {
     }
 }
 
+export type Reducer<S, X = {}, Y = {}> = {
+    <K extends string>(name: K, handler: (state: S) => S): ReducerBuilder<S, X & Setter<S, K>, Y & Dispatch0<K>>;
+    <K extends string, P>(name: K, handler: (state: S, payload: P) => S): Reducer<S, X & Handler<S, K, P>, Y & Dispatch1<K, P>>;
+    __dispatchType: Y;
+    getInitial(): S;
+    getReducer(): X;
+};
+
+export const createReducer = <S>(s: S): Reducer<S> => {
+    const reducer: { [key: string]: any } = {};
+    const result: any = (name: string, handler: (state: S, payload?: any) => any) => {
+        reducer[name] = handler;
+        return result;
+    };
+    result.getInitial = () => s;
+    result.getReducer = () => reducer;
+    return result;
+};
+
 export class StoreBuilder<X = {}, Y = (action: { type: string; payload: any }) => void> {
     public addReducer<R extends string, S, XX, YY>(
         reducerName: R,
-        reducerBuilder: ReducerBuilder<S, XX, YY>
+        reducerBuilder: Reducer<S, XX, YY>
     ): StoreBuilder<X & { [r in R]: S }, Y & { [r in R]: YY }> {
         const result = new StoreBuilder<X & { [r in R]: S }, Y & { [r in R]: YY }>();
         result.middlewares = this.middlewares;
