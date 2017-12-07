@@ -24,6 +24,8 @@ import { connect as redux_connect } from 'react-redux';
 // 12. give talk(s)
 
 
+export type Intersect<X, Y> = { [K in keyof (X & Y)]: (X & Y)[K] };
+
 export type Store<STATE, DISPATCH> = {
     getState(): STATE;
     subscribe(cb: () => void): () => void;
@@ -51,13 +53,13 @@ export class ReducerBuilder<S, X = {}, Y = {}> {
         this.initial = initial;
         this.reducer = {};
     }
-    public addSetter<K extends string>(name: K, handler: (state: S) => S): ReducerBuilder<S, X & Setter<S, K>, Y & Dispatch0<K>> {
-        const result = new ReducerBuilder<S, X & Setter<S, K>, Y & Dispatch0<K>>(this.initial);
+    public addSetter<K extends string>(name: K, handler: (state: S) => S): ReducerBuilder<S, Intersect<X, Setter<S, K>>, Intersect<Y, Dispatch0<K>>> {
+        const result = new ReducerBuilder<S, Intersect<X, Setter<S, K>>, Intersect<Y, Dispatch0<K>>>(this.initial);
         result.reducer = { ...this.reducer, [name]: handler };
         return result;
     }
-    public addHandler<K extends string, P>(name: K, handler: (state: S, payload: P) => S): ReducerBuilder<S, X & Handler<S, K, P>, Y & Dispatch1<K, P>> {
-        const result = new ReducerBuilder<S, X & Handler<S, K, P>, Y & Dispatch1<K, P>>(this.initial);
+    public addHandler<K extends string, P>(name: K, handler: (state: S, payload: P) => S): ReducerBuilder<S, Intersect<X, Handler<S, K, P>>, Intersect<Y, Dispatch1<K, P>>> {
+        const result = new ReducerBuilder<S, Intersect<X, Handler<S, K, P>>, Intersect<Y, Dispatch1<K, P>>>(this.initial);
         result.reducer = { ...this.reducer, [name]: handler };
         return result;
     }
@@ -70,8 +72,8 @@ export class ReducerBuilder<S, X = {}, Y = {}> {
 }
 
 export type Reducer<S, X = {}, Y = {}> = {
-    <K extends string>(name: K, handler: (state: S) => S): Reducer<S, X & Setter<S, K>, Y & Dispatch0<K>>;
-    <K extends string, P>(name: K, handler: (state: S, payload: P) => S): Reducer<S, X & Handler<S, K, P>, Y & Dispatch1<K, P>>;
+    <K extends string>(name: K, handler: (state: S) => S): Reducer<S, Intersect<X, Setter<S, K>>, Intersect<Y, Dispatch0<K>>>;
+    <K extends string, P>(name: K, handler: (state: S, payload: P) => S): Reducer<S, Intersect<X, Handler<S, K, P>>, Intersect<Y, Dispatch1<K, P>>>;
     __dispatchType: Y;
     getInitial(): S;
     getReducer(): X;
@@ -92,8 +94,8 @@ export class StoreBuilder<X = {}, Y = (action: { type: string; payload: any }) =
     public addReducer<R extends string, S, XX, YY>(
         reducerName: R,
         reducerBuilder: Reducer<S, XX, YY>
-    ): StoreBuilder<X & { [r in R]: S }, Y & { [r in R]: YY }> {
-        const result = new StoreBuilder<X & { [r in R]: S }, Y & { [r in R]: YY }>();
+    ): StoreBuilder<Intersect<X, { [r in R]: S }>, Intersect<Y, { [r in R]: YY }>> {
+        const result = new StoreBuilder<Intersect<X, { [r in R]: S }>, Intersect<Y, { [r in R]: YY }>>();
         result.middlewares = this.middlewares;
         result.reducerBuilders = { ...this.reducerBuilders, [reducerName]: reducerBuilder };
         return result;
