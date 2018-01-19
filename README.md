@@ -1,27 +1,32 @@
 # typeful-redux
 
-A type-safe, low boilerplate way of using redux from TypeScript.
+A type-safe, low boilerplate wrapper for redux to be used in TypeScript projects.
 
-## Elevator Pitch
+## Elevator pitch
+
+This is how you create
 
 ```TypeScript
+interface TodoItem {
+    task: string;
+    completed: boolean;
+}
+
 // Create a new reducer with initial state and three actions
-const TodoReducer = new ReducerBuilder([] as TodoItem[]).addSetter(
-    'clear', s => []
-).addHandler(
-    'add', (s, newItem: TodoItem) => [...s, newItem]
-).addHandler(
-    'toggle', (s, index: number) => [
+const TodoReducer = crateReducer([] as TodoItem[])
+    ('clear', s => [])
+    ('add', (s, newItem: TodoItem) => [...s, newItem])
+    ('toggle', (s, index: number) => [
         ...s.slice(0, i),
         { ...s[i], completed: !s[i].completed },
         ...s.slice(i + 1)
-    ]
-);
+    ]);
 
 // Create the store
 const store = new StoreBuilder().addReducer('todos', TodoReducer).build();
 
-store.getState(); // type: { todos: TodoItem[] }
+// The result has type: { todos: TodoItem[] }
+store.getState();
 
 // Everything is fully typechecked
 store.dispatch.todos.clear();
@@ -31,10 +36,6 @@ store.dispatch.todos.add({
 });
 store.dispatch.todos.toggle(0);
 ```
-
-## Status
-
-alpha - tread carefully.
 
 ## Motivation
 
@@ -50,4 +51,4 @@ MIT
 
 
 [redux]: http://redux.js.org
-[typeful-redux]: https://github.com/paulkoerbitz/typeful-redux
+[typeful-redux]: https://gitlab.com/paul.koerbitz/typeful-redux
