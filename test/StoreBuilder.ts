@@ -19,9 +19,35 @@ describe('StoreBuilder', () => {
 
         it('a store with a single simple reducer reduces actions correctly', () => {
             const reducer = createReducer(0)
-                ('increment', (s: number) => s + 1)
-                ('decrement', (s: number) => s - 1)
+                ('increment', s => s + 1)
+                ('decrement', s => s - 1)
                 ('set', (_s: number, newValue: number) => newValue);
+            const store = new StoreBuilder().addReducer('counter', reducer).build();
+
+            expect(store.getState().counter).to.equal(0);
+
+            store.dispatch.counter.set(5);
+            expect(store.getState().counter).to.equal(5);
+
+            store.dispatch.counter.increment();
+            store.dispatch.counter.increment();
+            expect(store.getState().counter).to.equal(7);
+
+            store.dispatch.counter.decrement();
+            store.dispatch.counter.decrement();
+            store.dispatch.counter.decrement();
+            expect(store.getState().counter).to.equal(4);
+
+            store.dispatch.counter.set(-2);
+            expect(store.getState().counter).to.equal(-2);
+
+        });
+
+        it('reducer can also be created with .addSetter and .addHandler', () => {
+            const reducer = createReducer(0)
+                .addSetter('increment', s => s + 1)
+                .addSetter('decrement', s => s - 1)
+                .addHandler('set', (_s, newValue: number) => newValue);
             const store = new StoreBuilder().addReducer('counter', reducer).build();
 
             expect(store.getState().counter).to.equal(0);

@@ -1,29 +1,6 @@
 import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { connect as redux_connect } from 'react-redux';
 
-// TODO
-//  1. ~~~fix store type signature (right now only the first 'state' is available from 'getState')~~~
-//  2. ~~~add 'get' method to return plain action object~~~
-//  3. ~~~think about how to use this from mapDispatchToProps~~~
-//     the question is: how can we declare that the dispatch function should fulfill a certain
-//     typesig without depending on a store implementation.
-//
-//     OK, the way to do this is with a typeof hack - this is a bit unfortunate, but so be it
-//     #6606 tracks 'typeof on any expression' which would solve this problem
-//
-//  6. ~~~cleanup names and definitions~~~
-//  7. ~~~implement (?)~~~
-//  9. ~~~adapt this use in sr-ui~~~
-//
-//  4. Implement type sig of connect function which requires / enables typesafe mapDispatchToProps
-//     ---> OK, this is a bit of work, I'll do this after adapting it in sr-ui to have a real use case
-//
-//  8. Write draft of blog post
-// 10. create library
-// 11. write blog post
-// 12. give talk(s)
-
-
 export type Intersect<X, Y> = { [K in keyof (X & Y)]: (X & Y)[K] };
 
 export type Store<STATE, DISPATCH> = {
@@ -45,46 +22,25 @@ export type Handler<S, K extends string, P> = {
     [k in K]: (x1: S, x2: P) => S
 };
 
-export class ReducerBuilder<S, X = {}, Y = {}> {
-    private initial: S;
-    private reducer: {};
-    public __dispatchType: Y = undefined as any;
-    public constructor(initial: S) {
-        this.initial = initial;
-        this.reducer = {};
-    }
-    public addSetter<K extends string>(name: K, handler: (state: S) => S): ReducerBuilder<S, Intersect<X, Setter<S, K>>, Intersect<Y, Dispatch0<K>>> {
-        const result = new ReducerBuilder<S, Intersect<X, Setter<S, K>>, Intersect<Y, Dispatch0<K>>>(this.initial);
-        result.reducer = { ...this.reducer, [name]: handler };
-        return result;
-    }
-    public addHandler<K extends string, P>(name: K, handler: (state: S, payload: P) => S): ReducerBuilder<S, Intersect<X, Handler<S, K, P>>, Intersect<Y, Dispatch1<K, P>>> {
-        const result = new ReducerBuilder<S, Intersect<X, Handler<S, K, P>>, Intersect<Y, Dispatch1<K, P>>>(this.initial);
-        result.reducer = { ...this.reducer, [name]: handler };
-        return result;
-    }
-    public getInitial(): S {
-        return this.initial;
-    }
-    public getReducer(): X {
-        return this.reducer as any;
-    }
-}
-
 export type Reducer<S, X = {}, Y = {}> = {
     <K extends string>(name: K, handler: (state: S) => S): Reducer<S, Intersect<X, Setter<S, K>>, Intersect<Y, Dispatch0<K>>>;
     <K extends string, P>(name: K, handler: (state: S, payload: P) => S): Reducer<S, Intersect<X, Handler<S, K, P>>, Intersect<Y, Dispatch1<K, P>>>;
-    __dispatchType: Y;
+    addSetter<K extends string>(name: K, handler: (state: S) => S): Reducer<S, Intersect<X, Setter<S, K>>, Intersect<Y, Dispatch0<K>>>;
+    addHandler<K extends string, P>(name: K, handler: (state: S, payload: P) => S): Reducer<S, Intersect<X, Handler<S, K, P>>, Intersect<Y, Dispatch1<K, P>>>;
     getInitial(): S;
     getReducer(): X;
+    __dispatchType: Y;
 };
 
 export const createReducer = <S>(s: S): Reducer<S> => {
     const reducer: { [key: string]: any } = {};
-    const result: any = (name: string, handler: (state: S, payload?: any) => any) => {
+    const addHandler = (name: string, handler: (state: S, payload?: any) => any) => {
         reducer[name] = handler;
         return result;
     };
+    const result = addHandler as any;
+    result.addSetter = addHandler;
+    result.addHandler = addHandler;
     result.getInitial = () => s;
     result.getReducer = () => reducer;
     return result;
@@ -116,8 +72,10 @@ export class StoreBuilder<X = {}, Y = (action: { type: string; payload: any }) =
         (store as any).dispatch = dispatchFunctionsFactory(store);
         return store;
     }
+
     private reducerBuilders: { [key: string]: any } = {};
     private middlewares: any[] = [];
+
     private buildMiddleware(): any {
         return applyMiddleware(...this.middlewares);
     }
@@ -213,96 +171,3 @@ export interface Connect {
 }
 
 export const connect: Connect = redux_connect;
-
-
-/*
-interface UserInfo {
-    username?: string;
-    role?: string;
-}
-
-interface Template {
-    foo: string;
-}
-
-// Do this with the real functions in user and template
-const UserReducer = new ReducerBuilder({} as UserInfo)
-    .addHandler(
-        'login', (s) => ({})
-    )
-    .addHandler(
-        'logout', (s) => ({username: undefined, role: undefined })
-    )
-    .addHandler(
-        'start_login', (s: UserInfo, payload: UserInfo) => ({ ...payload })
-    );
-
-const TemplateReducer = new ReducerBuilder({ foo: "bar" } as Template)
-    .addHandler(
-        'reset', s => ({ foo: "bar" })
-    )
-    .addHandler(
-        'add_element', (s: Template, payload: string) => ({ foo: payload })
-    );
-
-const store2 = new StoreBuilder()
-    .addReducer('user', UserReducer)
-    .addReducer('template', TemplateReducer)
-    .addMiddleware({})
-    .build();
-
-const store3 = true ? undefined : new StoreBuilder()
-    .addReducer('user', UserReducer)
-    .addReducer('template', TemplateReducer)
-    .build();
-
-type UserTemplateStore = typeof store3;
-
-type MyType = typeof store2;
-
-let foo2: MyType = undefined as any;
-
-foo2.dispatch.user.login({});
-foo2.dispatch.user.start_login({ username: 'foo', role: 'bar' });
-
-const s = store2.getState();
-s.template.foo;
-s.user.role;
-s.user.username;
-
-const add_element = store2.dispatch.template.add_element.get('foo');
-store2.dispatch.user.login({});
-store2.dispatch.template.add_element('foo');
-store2.dispatch.template.reset({});
-
-const foo = store2.dispatch.user.login.get({});
-*/
-
-/**
- * TODO: Safer connect wrapper
- * Should check that the state required by the mapStateToProps is acutally
- * available on the new props. Should also check that the functions needed on
- * the dispatch object are available on the store.
- *
- * @param mapStateToProps
- * @param mapDispatchToProps
- */
-/*
-export function connect<State, OldProps, NewProps>(
-    return redux_connect(mapStateToProps, mapDispatchToProps)
-    mapDispatchToProps: (dispatch: Dispatch, newProps: NewProps) => PropsFromDispatch
-    //
-    mapStateToProps: (state: State, newProps: NewProps) => PropsFromState,
-//        /---> OK, this is a bit of work, I'll do this after adapting it in sr-ui to have a real use case
-//
-): (cc: React.ComponentClass<OldProps>) => ComponentClass<NewProps> {
-}
-    */
-
-// const state = store.getState();
-/*
-store.dispatch.user.start_login({ username: "jon.doe", role: "admin" });
-store.dispatch.user.logout();
-store.dispatch.user.login();
-store.dispatch.template.add_element("quox");
-*/
