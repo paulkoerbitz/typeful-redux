@@ -1,6 +1,6 @@
 import 'mocha';
 import { expect } from 'chai';
-import { ReducerBuilder, StoreBuilder } from '../src';
+import { createReducer, StoreBuilder } from '../src';
 
 describe('StoreBuilder', () => {
     describe('created stores', () => {
@@ -18,13 +18,10 @@ describe('StoreBuilder', () => {
         });
 
         it('a store with a single simple reducer reduces actions correctly', () => {
-            const reducer = new ReducerBuilder(0).addSetter(
-                'increment', s => s + 1
-            ).addSetter(
-                'decrement', s => s - 1
-            ).addHandler(
-                'set', (_s, newValue: number) => newValue
-            );
+            const reducer = createReducer(0)
+                ('increment', (s: number) => s + 1)
+                ('decrement', (s: number) => s - 1)
+                ('set', (_s: number, newValue: number) => newValue);
             const store = new StoreBuilder().addReducer('counter', reducer).build();
 
             expect(store.getState().counter).to.equal(0);
