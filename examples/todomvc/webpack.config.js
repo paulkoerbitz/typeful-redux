@@ -7,7 +7,7 @@ module.exports = function () {
     var externals = {};
     var plugins = [new HtmlWebpackPlugin({
         title: "Example Todo",
-        template: "./index.html",
+        template: "./src/index.html",
         hash: true,
         inject: true
     })];
@@ -21,9 +21,12 @@ module.exports = function () {
     };
     var modules = {
         loaders: [{
-            test: /\.tsx$/,
+            test: /\.tsx?$/,
             loader: 'ts-loader',
-            exclude: ['node_modules', 'test', 'script']
+            exclude: ['node_modules']
+        }, {
+            test: /\.css$/,
+            loader: ['style-loader', 'css-loader']
         }]
     };
     var devServer = {
@@ -36,7 +39,7 @@ module.exports = function () {
         }
     };
     return {
-        entry: './todos.tsx',
+        entry: './src/todos.tsx',
         devtool: 'source-map',
         output: output,
         resolve: resolve,
