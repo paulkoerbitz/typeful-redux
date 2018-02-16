@@ -48,6 +48,8 @@ store.dispatch.todos.add({
 store.dispatch.todos.toggle(0);
 ```
 
+A full runnalbe (albeit very simple) example can be found [here](./examples/todomvc/).
+
 ## Motivation
 
 [redux] is a fantastic approach to manage state in single page applications.
