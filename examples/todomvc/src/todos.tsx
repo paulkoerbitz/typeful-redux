@@ -21,7 +21,11 @@ const TodoReducer = createReducer([] as TodoItem[])
         ...s.slice(0, p.idx),
         { ...s[p.idx], task: p.task },
         ...s.slice(p.idx + 1)
-    ]);
+    ])
+    ('remove', (s: TodoItem[], idx: number) => [
+        ...s.slice(0, idx), ...s.slice(idx + 1)
+    ])
+    ;
 
 type TodoDispatch = typeof TodoReducer.__dispatchType;
 
@@ -43,6 +47,7 @@ interface TodoProps {
     item: TodoItem;
     toggle(): void;
     edit(task: string): void;
+    delete(): void;
 }
 
 interface TodoState {
@@ -85,7 +90,7 @@ class TodoComponent extends React.Component<TodoProps, TodoState> {
                         onClick={toggle}
                     />
                     <label onDoubleClick={this.edit}>{this.props.item.task}</label>
-                    <button className="destroy" />
+                    <button className="destroy" onClick={this.props.delete} />
                 </div>
                 <input
                     className="edit"
@@ -122,7 +127,7 @@ class TodoListComponent extends React.Component<TodoListProps> {
 
     render() {
         const {
-            todos, clear, toggle, edit, clearCompleted,
+            todos, clear, toggle, edit, remove, clearCompleted,
             filter, all, active, completed
         } = this.props;
 
@@ -140,6 +145,7 @@ class TodoListComponent extends React.Component<TodoListProps> {
                 item={todo}
                 toggle={() => toggle(idx)}
                 edit={task => edit({ idx, task })}
+                delete={() => remove(idx)}
             />
         );
 
