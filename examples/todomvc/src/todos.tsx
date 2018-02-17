@@ -149,6 +149,11 @@ class TodoListComponent extends React.Component<TodoListProps> {
             />
         );
 
+        const clearCompletedButton = todos.some(todo => todo.completed)
+            ? <button onClick={clearCompleted} className="clear-completed">Clear completed</button>
+            : undefined;
+
+
         return (
             <div>
                 <header className="header">
@@ -180,7 +185,7 @@ class TodoListComponent extends React.Component<TodoListProps> {
                             <button onClick={completed} style={{ margin: "0 1em" }}>Completed</button>
                         </li>
                     </ul>
-                    <button onClick={clearCompleted} className="clear-completed">Clear completed</button>
+                    {clearCompletedButton}
                 </footer>
             </div>
         );
