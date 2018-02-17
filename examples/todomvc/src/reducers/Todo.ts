@@ -21,7 +21,6 @@ export const TodoReducer = createReducer([] as TodoItem[])
     ])
     ('remove', (s: TodoItem[], idx: number) => [
         ...s.slice(0, idx), ...s.slice(idx + 1)
-    ])
-    ;
+    ]);
 
 export type TodoDispatch = typeof TodoReducer.__dispatchType;
