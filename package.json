@@ -1,6 +1,6 @@
 {
     "name": "typeful-redux",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "description": "A typesafe, low boilerplate wrapper for redux to be used in TypeScript projects",
     "main": "dist/src/index.js",
     "types": "dist/src/index.d.ts",
