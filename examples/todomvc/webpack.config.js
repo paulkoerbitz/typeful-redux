@@ -6,7 +6,7 @@ module.exports = function () {
     var plugins = [];
     var externals = {};
     var plugins = [new HtmlWebpackPlugin({
-        title: "Example Todo",
+        title: "Typeful Todos",
         template: "./src/index.html",
         hash: true,
         inject: true
@@ -39,7 +39,7 @@ module.exports = function () {
         }
     };
     return {
-        entry: './src/todos.tsx',
+        entry: './src/index.tsx',
         devtool: 'source-map',
         output: output,
         resolve: resolve,
