@@ -48,7 +48,8 @@ store.dispatch.todos.add({
 store.dispatch.todos.toggle(0);
 ```
 
-A full runnalbe (albeit very simple) example can be found [here](./examples/todomvc/).
+A very simple, runnable example app can be found [here](./examples/simple-todo/). A TodoMVC implementation with
+slightly more features is availabe [here](./examples/todomvc/).
 
 ## Motivation
 
