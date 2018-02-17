@@ -17,10 +17,10 @@ Use `npm` or `yarn` to install. Example:
 ## Overview
 
 There are two reducers, `TodoReducer` and `FilterReducer` which live in the
-[reducers/](./reducers/) directory. They are quite small and come in at 23 and 7 lines of code, respectively.
+[src/reducers/](./src/reducers/) directory. They are quite small and come in at 23 and 7 lines of code, respectively.
 
 The two components `TodoComponent` and `TodoListComponent` are placed in the
-[components/](./components/) directory.
+[src/components/](./src/components/) directory.
 
 The main file is [./src/index.tsx](./src/index.tsx), it uses the reducers to
 create a store and creates the main application by connecting the store
