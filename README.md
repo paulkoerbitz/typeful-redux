@@ -172,8 +172,67 @@ and enables using the same reducer for multiple parts of the store.
 
 ### `connect`
 
-This is a re-export of the redux connect function, with a more restricted type to ensure that the typing of the `dispatch` object is known
-in the `mapDispatchToProps` function. This makes it possible to *propagate type errors through `connect`*, which is not possible with the current type definition of [react-redux]'s `connect`.
+This is a re-export of the redux connect function, with a more restricted type to ensure that the typing of the `dispatch` object is known in the `mapDispatchToProps` function. This makes it possible to *propagate type errors through `connect`*, which is not possible with the current type definition of [react-redux]'s `connect`.
+
+To explain how `connect` can be used to its full benefit, we must understand the type
+of the produced `store`. In general `store` will have the following type:
+
+```TypeScript
+type Store<STATE, DISPATCH> = {
+    getState(): STATE;
+    subscribe(): void;
+    dispatch: DISPATCH;
+};
+```
+
+where `STATE` is a map from the reducer names (here: `todos`) and the state types and
+`DISPATCH` is a map from the reducer names (again `todos`) to functions which dispatch
+the respective actions.
+
+Now the `connect` function is set up so given a `mapStateToProps` which accepts a `STATE`
+and a `mapDispatchToProps` which accepts a `DISPATCH`, it produces a container which needs
+to have a `{ store: Store<STATE, DISPATCH>; }` as part of properties. This way the types
+from the store can be propagated all the way to the components and changing the type
+of an action-reducer triggers a type-error in all the right places.
+
+```TypeScript
+interface State {
+    todos: TodoItem;
+}
+
+interface Dispatch {
+    todos: {
+        add(description: string): void;
+        clear(): void;
+        toggle(index: number): void;
+    };
+}
+// Let's say we have a `TodoListComponent` which wants the following
+// properties
+interface TodoListProps = {
+    todos: TodoItem;
+    add(description: string): void;
+    clear(): void;
+    toggle(index: number): void;
+}
+
+class TodoListComponent extends React.Component<TodoListProps> {
+    // ...
+}
+
+const mapStateToProps = (state: State) => state;
+const mapDispatchToProps = (dispatch: Dispatch) => dispatch.todos;
+
+
+// TodoListContainer is infered to have a type which requires a property
+// `{ store: Store<State, Dispatch> }`
+//
+const TodoListContainer = connect(mapStateToProps, mapDispatchToProps)(TodoListComponent);
+```
+
+`connect` can also be used with `mapStateToProps` and `mapDispatchToProps` with
+a second argument, these second arguments become part of the required properties
+of the connected container.
 
 ## License
 
