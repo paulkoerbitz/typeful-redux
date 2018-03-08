@@ -1,7 +1,7 @@
 import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { connect as redux_connect } from 'react-redux';
 
-export type Intersect<X, Y> = { [K in keyof (X & Y)]: (X & Y)[K] };
+export type Intersect<X, Y> = {[K in keyof (X & Y)]: (X & Y)[K]};
 
 export type Store<STATE, DISPATCH> = {
     getState(): STATE;
@@ -9,66 +9,84 @@ export type Store<STATE, DISPATCH> = {
     dispatch: DISPATCH;
 };
 
-export type Dispatch0<K extends string> = {
-    [k in K]: { (): void; }
+export type Dispatch0<NAME extends string> = {
+    [name in NAME]: { (): void; }
 };
-export type Dispatch1<K extends string, P> = {
-    [k in K]: { (x: P): void; }
-};
-export type Setter<S, K extends string> = {
-    [k in K]: (x1: S) => void
-};
-export type Handler<S, K extends string, P> = {
-    [k in K]: (x1: S, x2: P) => S
+export type Dispatch1<NAME extends string, PAYLOAD> = {
+    [name in NAME]: { (payload: PAYLOAD): void; }
 };
 
-export type Reducer<S, X = {}, Y = {}> = {
-    <K extends string>(name: K, handler: (state: S) => S): Reducer<S, Intersect<X, Setter<S, K>>, Intersect<Y, Dispatch0<K>>>;
-    <K extends string, P>(name: K, handler: (state: S, payload: P) => S): Reducer<S, Intersect<X, Handler<S, K, P>>, Intersect<Y, Dispatch1<K, P>>>;
-    addSetter<K extends string>(name: K, handler: (state: S) => S): Reducer<S, Intersect<X, Setter<S, K>>, Intersect<Y, Dispatch0<K>>>;
-    addHandler<K extends string, P>(name: K, handler: (state: S, payload: P) => S): Reducer<S, Intersect<X, Handler<S, K, P>>, Intersect<Y, Dispatch1<K, P>>>;
-    getInitial(): S;
-    getReducer(): X;
-    __dispatchType: Y;
+export type Reducer<REDUCER_STATE, REDUCER_DISPATCH = {}> = {
+    <REDUCER_NAME extends string>(
+        name: REDUCER_NAME,
+        handler: (state: REDUCER_STATE) => REDUCER_STATE
+    ): Reducer<REDUCER_STATE, Intersect<REDUCER_DISPATCH, Dispatch0<REDUCER_NAME>>>;
+
+    <REDUCER_NAME extends string, PAYLOAD>(
+        name: REDUCER_NAME,
+        handler: (state: REDUCER_STATE, payload: PAYLOAD) => REDUCER_STATE
+    ): Reducer<REDUCER_STATE, Intersect<REDUCER_DISPATCH, Dispatch1<REDUCER_NAME, PAYLOAD>>>;
+
+    addSetter<REDUCER_NAME extends string>(
+        name: REDUCER_NAME,
+        handler: (state: REDUCER_STATE) => REDUCER_STATE
+    ): Reducer<REDUCER_STATE, Intersect<REDUCER_DISPATCH, Dispatch0<REDUCER_NAME>>>;
+
+    addHandler<REDUCER_NAME extends string, PAYLOAD>(
+        name: REDUCER_NAME,
+        handler: (state: REDUCER_STATE, payload: PAYLOAD) => REDUCER_STATE
+    ): Reducer<REDUCER_STATE, Intersect<REDUCER_DISPATCH, Dispatch1<REDUCER_NAME, PAYLOAD>>>;
+
+    getInitial(): REDUCER_STATE;
+    getReducer(): any;
+    __dispatchType: REDUCER_DISPATCH;
 };
 
-export const createReducer = <S>(s: S): Reducer<S> => {
+export const createReducer = <REDUCER_STATE>(initialState: REDUCER_STATE): Reducer<REDUCER_STATE> => {
     const reducer: { [key: string]: any } = {};
-    const addHandler = (name: string, handler: (state: S, payload?: any) => any) => {
+    const addHandler = (name: string, handler: (state: REDUCER_STATE, payload?: any) => any) => {
         reducer[name] = handler;
         return result;
     };
     const result = addHandler as any;
     result.addSetter = addHandler;
     result.addHandler = addHandler;
-    result.getInitial = () => s;
+    result.getInitial = () => initialState;
     result.getReducer = () => reducer;
     return result;
 };
 
-export class StoreBuilder<X = {}, Y = (action: { type: string; payload: any }) => void> {
-    public addReducer<R extends string, S, XX, YY>(
-        reducerName: R,
-        reducerBuilder: Reducer<S, XX, YY>
-    ): StoreBuilder<Intersect<X, { [r in R]: S }>, Intersect<Y, { [r in R]: YY }>> {
-        const result = new StoreBuilder<Intersect<X, { [r in R]: S }>, Intersect<Y, { [r in R]: YY }>>();
+export type DEFAULT_STORE_DISPATCH = (action: { type: string; payload: any }) => void;
+
+export class StoreBuilder<STORE_STATE = {}, STORE_DISPATCH = DEFAULT_STORE_DISPATCH> {
+    public addReducer<REDUCER_NAME extends string, REDUCER_STATE, REDUCER_DISPATCH>(
+        reducerName: REDUCER_NAME,
+        reducerBuilder: Reducer<REDUCER_STATE, REDUCER_DISPATCH>
+    ): StoreBuilder<
+    Intersect<STORE_STATE, {[reducerName in REDUCER_NAME]: REDUCER_STATE }>,
+    Intersect<STORE_DISPATCH, {[reducerName in REDUCER_NAME]: REDUCER_DISPATCH }>
+    > {
+        const result = new StoreBuilder<
+            Intersect<STORE_STATE, {[r in REDUCER_NAME]: REDUCER_STATE }>,
+            Intersect<STORE_DISPATCH, {[r in REDUCER_NAME]: REDUCER_DISPATCH }>
+            >();
         result.middlewares = this.middlewares;
         result.reducerBuilders = { ...this.reducerBuilders, [reducerName]: reducerBuilder };
         return result;
     }
-    public addMiddleware(middleware: any): StoreBuilder<X, Y> {
-        const result = new StoreBuilder<X, Y>();
+    public addMiddleware(middleware: any): StoreBuilder<STORE_STATE, STORE_DISPATCH> {
+        const result = new StoreBuilder<STORE_STATE, STORE_DISPATCH>();
         result.reducerBuilders = this.reducerBuilders;
         result.middlewares = [...this.middlewares, middleware];
         return result;
     }
-    public build(): Store<X, Y> {
+    public build(): Store<STORE_STATE, STORE_DISPATCH> {
         const { reducers, dispatchFunctionsFactory } = this.buildReducers();
         const store = createStore(
             reducers,
             this.buildInitialState(),
             this.buildMiddleware()
-        ) as any as Store<X, Y>;
+        ) as any as Store<STORE_STATE, STORE_DISPATCH>;
         (store as any).dispatch = dispatchFunctionsFactory(store);
         return store;
     }
@@ -151,10 +169,9 @@ export class StoreBuilder<X = {}, Y = (action: { type: string; payload: any }) =
     }
 }
 
-/*
+/**
  * strongly typed connect
  */
-
 export interface MapStateToProps<STATE, OWN_PROPS, PROPS_FROM_STATE> {
     (state: STATE, ownProps: OWN_PROPS): PROPS_FROM_STATE;
 }
