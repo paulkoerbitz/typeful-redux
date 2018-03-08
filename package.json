@@ -42,6 +42,8 @@
     },
     "scripts": {
         "build": "tsc",
-        "test": "mocha --require ts-node/register --watch-extensions ts,tsx \"test/**/*.ts\""
+        "test": "mocha --require ts-node/register --watch-extensions ts,tsx \"test/**/*.ts\"",
+        "typecheck": "tsc -w --noEmit",
+        "prepare": "tsc"
     }
 }
