@@ -16,11 +16,11 @@ interface TodoItem {
 // Create a new reducer with initial state [], then add three actions
 const TodoReducer = createReducer([] as TodoItem[])
     ('clear', s => [])
-    ('add', (s, newItem: TodoItem) => [...s, newItem])
+    ('add', (s: TodoItem[], newItem: TodoItem) => [...s, newItem])
     ('toggle', (s: TodoItem[], index: number) => [
-        ...s.slice(0, i),
-        { ...s[i], completed: !s[i].completed },
-        ...s.slice(i + 1)
+        ...s.slice(0, index),
+        { ...s[index], completed: !s[index].completed },
+        ...s.slice(index + 1)
     ]);
 
 // Create the store
@@ -104,9 +104,9 @@ const TodoReducer = createReducer([] as TodoItem[])
     ('clear', s => [])
     ('add', (s: TodoItem[], newItem: TodoItem) => [...s, newItem])
     ('toggle', (s: TodoItem[], index: number) => [
-        ...s.slice(0, i),
-        { ...s[i], completed: !s[i].completed },
-        ...s.slice(i + 1)
+        ...s.slice(0, index),
+        { ...s[index], completed: !s[index].completed },
+        ...s.slice(index + 1)
     ]);
 ```
 
@@ -115,11 +115,11 @@ There is an alternative syntax to create a reducer with `addSetter` and `addHand
 ```TypeScript
 const TodoReducer = createReducer([] as TodoItem[])
     .addSetter('clear', s => [])
-    .addHandler('add', (s, newItem: TodoItem) => [...s, newItem])
-    .addHandler('toggle', (s, index: number) => [
-        ...s.slice(0, i),
-        { ...s[i], completed: !s[i].completed },
-        ...s.slice(i + 1)
+    .addHandler('add', (s: TodoItem[], newItem: TodoItem) => [...s, newItem])
+    .addHandler('toggle', (s: TodoItem[], index: number) => [
+        ...s.slice(0, index),
+        { ...s[index], completed: !s[index].completed },
+        ...s.slice(index + 1)
     ]);
 ```
 
@@ -209,7 +209,7 @@ interface Dispatch {
 }
 // Let's say we have a `TodoListComponent` which wants the following
 // properties
-interface TodoListProps = {
+interface TodoListProps {
     todos: TodoItem;
     add(description: string): void;
     clear(): void;
