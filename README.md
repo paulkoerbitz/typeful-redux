@@ -234,6 +234,11 @@ const TodoListContainer = connect(mapStateToProps, mapDispatchToProps)(TodoListC
 a second argument, these second arguments become part of the required properties
 of the connected container.
 
+## How does it work?
+
+A description of the tricks used to make typeful-redux do what it does can be found
+[here](http://koerbitz.me).
+
 ## License
 
 MIT
