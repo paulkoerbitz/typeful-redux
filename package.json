@@ -28,14 +28,16 @@
     },
     "devDependencies": {
         "@types/chai": "^4.0.4",
-        "@types/mocha": "^2.2.44",
+        "@types/jest": "^22.2.2",
         "@types/react-redux": "^5.0.12",
         "@types/redux": "^3.6.0",
         "chai": "^4.1.2",
+        "jest": "^22.4.3",
         "mocha": "^4.0.1",
         "react": ">=15.0.0",
         "react-redux": "5.x",
         "redux": "^3.x",
+        "ts-jest": "^22.4.2",
         "ts-node": "^3.3.0",
         "typedoc": "^0.9.0",
         "typescript": "^2.6.1"
@@ -45,5 +47,19 @@
         "test": "mocha --require ts-node/register --watch-extensions ts,tsx \"test/**/*.ts\"",
         "typecheck": "tsc -w --noEmit",
         "prepare": "tsc"
+    },
+    "jest": {
+        "transform": {
+            "^.+\\.tsx?$": "ts-jest"
+        },
+        "testRegex": "test/.*\\.tsx?$",
+        "moduleFileExtensions": [
+            "ts",
+            "tsx",
+            "js",
+            "jsx",
+            "json",
+            "node"
+        ]
     }
 }
