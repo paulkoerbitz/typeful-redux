@@ -5,6 +5,7 @@ export type Store<STATE, DISPATCH> = {
     getState(): STATE;
     subscribe(cb: () => void): () => void;
     dispatch: DISPATCH;
+    replaceReducer(reducer: any): void;
 };
 
 export type Dispatch0<NAME extends string> = {
