@@ -40,6 +40,9 @@ export type Reducer<REDUCER_STATE, REDUCER_DISPATCH = {}> = {
     __dispatchType: REDUCER_DISPATCH;
 };
 
+export type StoreStateType<S> = S extends Store<infer X, any> ? X : never;
+export type StoreDispatchType<S> = S extends Store<any, infer X> ? X : never;
+
 export const createReducer = <REDUCER_STATE>(initialState: REDUCER_STATE): Reducer<REDUCER_STATE> => {
     const reducer: { [key: string]: any } = {};
     const addHandler = (name: string, handler: (state: REDUCER_STATE, payload?: any) => any) => {
