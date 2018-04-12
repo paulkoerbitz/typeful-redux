@@ -1,8 +1,6 @@
 import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { connect as redux_connect } from 'react-redux';
 
-export type Intersect<X, Y> = {[K in keyof (X & Y)]: (X & Y)[K]};
-
 export type Store<STATE, DISPATCH> = {
     getState(): STATE;
     subscribe(cb: () => void): () => void;
@@ -20,22 +18,22 @@ export type Reducer<REDUCER_STATE, REDUCER_DISPATCH = {}> = {
     <REDUCER_NAME extends string>(
         name: REDUCER_NAME,
         handler: (state: REDUCER_STATE) => REDUCER_STATE
-    ): Reducer<REDUCER_STATE, Intersect<REDUCER_DISPATCH, Dispatch0<REDUCER_NAME>>>;
+    ): Reducer<REDUCER_STATE, REDUCER_DISPATCH & Dispatch0<REDUCER_NAME>>;
 
     <REDUCER_NAME extends string, PAYLOAD>(
         name: REDUCER_NAME,
         handler: (state: REDUCER_STATE, payload: PAYLOAD) => REDUCER_STATE
-    ): Reducer<REDUCER_STATE, Intersect<REDUCER_DISPATCH, Dispatch1<REDUCER_NAME, PAYLOAD>>>;
+    ): Reducer<REDUCER_STATE, REDUCER_DISPATCH & Dispatch1<REDUCER_NAME, PAYLOAD>>;
 
     addSetter<REDUCER_NAME extends string>(
         name: REDUCER_NAME,
         handler: (state: REDUCER_STATE) => REDUCER_STATE
-    ): Reducer<REDUCER_STATE, Intersect<REDUCER_DISPATCH, Dispatch0<REDUCER_NAME>>>;
+    ): Reducer<REDUCER_STATE, REDUCER_DISPATCH & Dispatch0<REDUCER_NAME>>;
 
     addHandler<REDUCER_NAME extends string, PAYLOAD>(
         name: REDUCER_NAME,
         handler: (state: REDUCER_STATE, payload: PAYLOAD) => REDUCER_STATE
-    ): Reducer<REDUCER_STATE, Intersect<REDUCER_DISPATCH, Dispatch1<REDUCER_NAME, PAYLOAD>>>;
+    ): Reducer<REDUCER_STATE, REDUCER_DISPATCH & Dispatch1<REDUCER_NAME, PAYLOAD>>;
 
     getInitial(): REDUCER_STATE;
     getReducer(): any;
@@ -63,12 +61,12 @@ export class StoreBuilder<STORE_STATE = {}, STORE_DISPATCH = DEFAULT_STORE_DISPA
         reducerName: REDUCER_NAME,
         reducerBuilder: Reducer<REDUCER_STATE, REDUCER_DISPATCH>
     ): StoreBuilder<
-    Intersect<STORE_STATE, {[reducerName in REDUCER_NAME]: REDUCER_STATE }>,
-    Intersect<STORE_DISPATCH, {[reducerName in REDUCER_NAME]: REDUCER_DISPATCH }>
+        STORE_STATE & {[reducerName in REDUCER_NAME]: REDUCER_STATE },
+        STORE_DISPATCH & {[reducerName in REDUCER_NAME]: REDUCER_DISPATCH }
     > {
         const result = new StoreBuilder<
-            Intersect<STORE_STATE, {[r in REDUCER_NAME]: REDUCER_STATE }>,
-            Intersect<STORE_DISPATCH, {[r in REDUCER_NAME]: REDUCER_DISPATCH }>
+            STORE_STATE & {[r in REDUCER_NAME]: REDUCER_STATE },
+            STORE_DISPATCH & {[r in REDUCER_NAME]: REDUCER_DISPATCH }
             >();
         result.middlewares = this.middlewares;
         result.reducerBuilders = { ...this.reducerBuilders, [reducerName]: reducerBuilder };
