@@ -9,6 +9,23 @@ export type Store<STATE, REDUCERS> = {
     replaceReducer(reducer: any): void;
 };
 
+export type StoreFromDispatch<STATE, DISPATCH> = {
+    getState(): STATE;
+    dispatch: DISPATCH;
+    actionCreators: ActionCreatorsFromDispatch<DISPATCH>;
+    subscribe(cb: () => void): () => void;
+    replaceReducer(reducer: any): void;
+};
+
+export type ActionCreatorsFromDispatch<Dispatch> = {
+    [ActionName in keyof Dispatch]: (payload: Arg1<Dispatch[ActionName]>) => {
+        type: ActionName;
+        payload: Arg1<Dispatch[ActionName]>
+    };
+};
+
+export type Arg1<X> = X extends (y: infer Y) => any ? Y : never;
+
 export type Action2Payload<NAME extends string, PAYLOAD> = {
     [name in NAME]: PAYLOAD
 };
@@ -20,32 +37,24 @@ export type Dispatch1<NAME extends string, PAYLOAD> = {
     [name in NAME]: { (payload: PAYLOAD): void; }
 };
 
-export type Remove<X extends string, Y extends string> =
-    ({ [x in X]: x } & {[y in Y]: never } & { [x in string]: never })[X];
-
-export type OmitKeys<X, K extends keyof X> =
-    Pick<X, Remove<keyof X, K>>;
-
-// type T0 = OmitKeys<{ a: number; b: string; c: number[]; }, 'a' | 'b'>;
-
 export type ActionObject<Action, Payload> = {
     type: Action;
     payload: Payload;
 };
 
-export type ExtractPayload<F> =
-    F extends (s: any, payload: infer P) => any ? P : never;
+export type ActionNames<X> = keyof X;
 
-export type ActionNames<X extends Object> = keyof X;
-
-export type DispatchArg<A2P extends Object> = {
+export type DispatchArg<A2P> = {
     [ActionType in keyof A2P]: {
         type: ActionType;
         payload: ExtractPayload<A2P[ActionType]>
     };
 }[keyof A2P];
 
-export type ActionCreatorsType<Action2PayloadTypes extends Object> = {
+export type ExtractPayload<F> =
+    F extends (state: any, payload: infer P) => any ? P : never;
+
+export type ActionCreatorsType<Action2PayloadTypes> = {
     [ActionType in keyof Action2PayloadTypes]:
         (payload: ExtractPayload<Action2PayloadTypes[ActionType]>) => {
             type: ActionType;
@@ -53,65 +62,13 @@ export type ActionCreatorsType<Action2PayloadTypes extends Object> = {
         };
 };
 
-export type DispatchObjectType<Action2PayloadTypes extends Object> = {
+export type DispatchObjectType<Action2PayloadTypes> = {
     [ActionType in keyof Action2PayloadTypes]:
         (payload: ExtractPayload<Action2PayloadTypes[ActionType]>) => void;
 };
 
 export type DispatchType<HANDLER> =
     ((action: DispatchArg<HANDLER>) => void) & DispatchObjectType<HANDLER>;
-
-// type T1 = DispatchArg<{a: number; b: string; }>;
-// type T2 = ActionCreators<{a: number; b: string; }>;
-// type T3 = DispatchObject<{ a: number; b: string; }>;
-
-// export type Omit<MAP extends Object, KEY extends keyof MAP> =
-//     ({ [K in KEY]: never } & { [K in keyof MAP]: MAP[K] });
-
-// type T0 = Omit<{ a: number; b: string; c: {} }, 'a'>;
-
-// export type Reducer<REDUCER_STATE, REDUCER_DISPATCH = {}, ACTION2PAYLOAD extends {} = {}> = {
-//     <REDUCER_NAME extends string>(
-//         name: REDUCER_NAME,
-//         handler: (state: REDUCER_STATE) => REDUCER_STATE
-//     ): Reducer<
-//         REDUCER_STATE,
-//         REDUCER_DISPATCH & Dispatch0<REDUCER_NAME>,
-//         ACTION2PAYLOAD & Action2Payload<REDUCER_NAME, void>
-//     >;
-
-//     <REDUCER_NAME extends string, PAYLOAD>(
-//         name: REDUCER_NAME,
-//         handler: (state: REDUCER_STATE, payload: PAYLOAD) => REDUCER_STATE
-//     ): Reducer<
-//         REDUCER_STATE,
-//         REDUCER_DISPATCH & Dispatch1<REDUCER_NAME, PAYLOAD>,
-//         ACTION2PAYLOAD & Action2Payload<REDUCER_NAME, PAYLOAD>
-//     >;
-
-//     addSetter<REDUCER_NAME extends string>(
-//         name: REDUCER_NAME,
-//         handler: (state: REDUCER_STATE) => REDUCER_STATE
-//     ): Reducer<
-//         REDUCER_STATE,
-//         REDUCER_DISPATCH & Dispatch0<REDUCER_NAME>,
-//         ACTION2PAYLOAD & Action2Payload<REDUCER_NAME, void>
-//     >;
-
-//     addHandler<REDUCER_NAME extends string, PAYLOAD>(
-//         name: REDUCER_NAME,
-//         handler: (state: REDUCER_STATE, payload: PAYLOAD) => REDUCER_STATE
-//     ): Reducer<
-//         REDUCER_STATE,
-//         REDUCER_DISPATCH & Dispatch0<REDUCER_NAME>,
-//         ACTION2PAYLOAD & Action2Payload<REDUCER_NAME, PAYLOAD>
-//     >;
-
-//     getInitial(): REDUCER_STATE;
-//     getReducer(): any;
-//     getActions(): Array<keyof ACTION2PAYLOAD>;
-//     __dispatchType: REDUCER_DISPATCH;
-// };
 
 export type PayloadTypeForAction<NAME extends string, REDUCER> =
     REDUCER extends Reducer<any, infer HANDLER>
@@ -121,7 +78,7 @@ export type PayloadTypeForAction<NAME extends string, REDUCER> =
         : never;
 
 export type StoreStateType<S> = S extends Store<infer X, any> ? X : never;
-export type StoreDispatchType<S> = S extends Store<any, infer X> ? X : never;
+export type StoreDispatchType<S> = S extends Store<any, infer X> ? DispatchType<X> : never;
 
 export type Reducer<STATE, HANDLER> = {
     initialState: STATE;
@@ -200,7 +157,7 @@ export class StoreBuilder<STORE_STATE = {}, REDUCERS extends {} = {}> {
     private buildInitialState(): STORE_STATE {
         const result: any = {};
         for (const key in this.reducers) {
-            if (this.reducers.hasOwnProperty(key)) {
+            if ((this.reducers as any).hasOwnProperty(key)) {
                 result[key] = this.reducers[key].initialState;
             }
         }
@@ -210,7 +167,7 @@ export class StoreBuilder<STORE_STATE = {}, REDUCERS extends {} = {}> {
         let reducers: any = {};
         let actionCreators: any = {};
         for (const reducerName in this.reducers) {
-            if (!this.reducers.hasOwnProperty(reducerName)) {
+            if (!(this.reducers as any).hasOwnProperty(reducerName)) {
                 continue;
             }
             const reducer = this.makeReducer(reducerName);
@@ -260,7 +217,7 @@ export interface MapDispatchToProps<DISPATCH, OWN_PROPS, PROPS_FROM_DISPATCH> {
 }
 
 export interface Connect {
-    <STATE, DISPATCH, OWN_PROPS extends { store: Store<STATE, DISPATCH>; }, PROPS_FROM_STATE, PROPS_FROM_DISPATCH>(
+    <STATE, DISPATCH, OWN_PROPS extends { store: StoreFromDispatch<STATE, DISPATCH>; }, PROPS_FROM_STATE, PROPS_FROM_DISPATCH>(
         mapStateToProps: MapStateToProps<STATE, OWN_PROPS, PROPS_FROM_STATE>,
         mapDispatchToProps: MapDispatchToProps<DISPATCH, OWN_PROPS, PROPS_FROM_DISPATCH>
     ): (component: React.ComponentClass<PROPS_FROM_STATE & PROPS_FROM_DISPATCH>) => React.ComponentClass<OWN_PROPS & { store: Store<STATE, DISPATCH>; }>;

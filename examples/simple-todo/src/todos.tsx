@@ -1,24 +1,26 @@
 import * as React from 'react';
 import { render } from 'react-dom';
-import { createReducer, StoreBuilder, connect } from 'typeful-redux';
+import { createReducer, StoreBuilder, connect, StoreDispatchType } from 'typeful-redux';
 
 interface TodoItem {
     task: string;
     completed: boolean;
 }
 
-const TodoReducer = createReducer([] as TodoItem[])
-    ('add', (s: TodoItem[], task: string) => [...s, { task, completed: false }])
-    ('clear', (_s: TodoItem[]) => [])
-    ('toggle', (s: TodoItem[], idx: number) => [
+const TodoReducer = createReducer([] as TodoItem[], {
+    ADD: (s: TodoItem[], task: string) => [...s, { task, completed: false }],
+    CLEAR: (_s: TodoItem[]) => [],
+    TOGGLE: (s: TodoItem[], idx: number) => [
         ...s.slice(0, idx),
         { task: s[idx].task, completed: !s[idx].completed },
-        ...s.slice(idx + 1)
-    ]);
+        ...s.slice(idx + 1)]
+});
 
 const store = new StoreBuilder()
     .addReducer('todos', TodoReducer)
     .build();
+
+type Dispatch = StoreDispatchType<typeof store>;
 
 interface TodoProps {
     item: TodoItem;
@@ -31,11 +33,9 @@ const TodoComponent = (p: TodoProps) =>
         {p.item.task}
     </li>;
 
-type TodoDispatch = typeof TodoReducer.__dispatchType;
-
 type TodoListProps = {
     todos: TodoItem[];
-} & TodoDispatch;
+} & Dispatch;
 
 class TodoListComponent extends React.Component<TodoListProps> {
     private input: HTMLInputElement | null = null;
@@ -43,15 +43,15 @@ class TodoListComponent extends React.Component<TodoListProps> {
     private handleSubmit = (e: React.FormEvent<any>) => {
         e.preventDefault();
         if (this.input != null) {
-            this.props.add(this.input.value);
+            this.props.ADD(this.input.value);
             this.input.value = "";
         }
     }
 
     render() {
-        const { todos, clear, toggle } = this.props;
+        const { todos, CLEAR, TOGGLE } = this.props;
         const items = todos.map((todo, idx) =>
-            <TodoComponent key={idx} item={todo} toggle={() => toggle(idx)} />
+            <TodoComponent key={idx} item={todo} toggle={() => TOGGLE(idx)} />
         );
 
         return (
@@ -64,19 +64,16 @@ class TodoListComponent extends React.Component<TodoListProps> {
                     {items}
                 </ul>
                 <div>
-                    <button onClick={clear}>Clear</button>
+                    <button onClick={CLEAR}>Clear</button>
                 </div>
             </div>
         );
     }
 }
 
-const mapStateToProps = (state: { todos: TodoItem[]; }) => ({
-    todos: state.todos
-});
+const mapStateToProps = (state: { todos: TodoItem[]; }) => state;
 
-const mapDisptachToProps = (dispatch: { todos: TodoDispatch; }) =>
-    dispatch.todos;
+const mapDisptachToProps = (dispatch: Dispatch) => dispatch;
 
 const TodoListContainer =
     connect(mapStateToProps, mapDisptachToProps)(TodoListComponent);

@@ -2,8 +2,8 @@
     "name": "typeful-redux",
     "version": "0.3.0",
     "description": "A typesafe, low boilerplate wrapper for redux to be used in TypeScript projects",
-    "main": "dist/src/index.js",
-    "types": "dist/src/index.d.ts",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/paulkoerbitz/typeful-redux"
@@ -29,18 +29,18 @@
     "devDependencies": {
         "@types/chai": "^4.0.4",
         "@types/jest": "^22.2.2",
-        "@types/react-redux": "^5.0.12",
+        "@types/react-redux": "^5.0.16",
         "@types/redux": "^3.6.0",
         "chai": "^4.1.2",
         "jest": "^22.4.3",
         "mocha": "^4.0.1",
-        "react": ">=15.0.0",
-        "react-redux": "5.x",
+        "react": "^16.3.1",
+        "react-redux": "^5.0.7",
         "redux": "^3.x",
         "ts-jest": "^22.4.2",
         "ts-node": "^3.3.0",
         "typedoc": "^0.9.0",
-        "typescript": "^2.8.0"
+        "typescript": "^2.8.1"
     },
     "scripts": {
         "build": "tsc",
@@ -61,5 +61,10 @@
             "json",
             "node"
         ]
+    },
+    "dependencies": {
+        "@types/react": "^16.3.11",
+        "@types/redux-saga": "^0.10.5",
+        "redux-saga": "^0.16.0"
     }
 }

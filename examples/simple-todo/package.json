@@ -9,8 +9,8 @@
         "redux": "^3.7.2",
         "reveal.js": "^3.6.0",
         "ts-loader": "^3.5.0",
-        "typeful-redux": "^0.2.1",
-        "typescript": "^2.7.1",
+        "typeful-redux": "../..",
+        "typescript": "^2.8.0",
         "webpack": "^3.11.0",
         "webpack-dev-server": "^2.11.1"
     },
