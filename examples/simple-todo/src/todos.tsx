@@ -16,7 +16,7 @@ const TodoReducer = createReducer([] as TodoItem[], {
         ...s.slice(idx + 1)]
 });
 
-const store = new StoreBuilder()
+export const store = new StoreBuilder()
     .addReducer('todos', TodoReducer)
     .build();
 
@@ -82,3 +82,8 @@ render(
     <TodoListContainer store={store} />,
     document.getElementById("app")
 );
+
+
+
+
+
