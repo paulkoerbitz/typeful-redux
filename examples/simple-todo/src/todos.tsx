@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { render } from 'react-dom';
-import { createReducer, StoreBuilder, connect, StoreDispatchType } from 'typeful-redux';
+import { createReducer, combineReducers, createStore, createActionCreators, connect } from '../../../src';
 
 interface TodoItem {
     task: string;
@@ -16,11 +16,10 @@ const TodoReducer = createReducer([] as TodoItem[], {
         ...s.slice(idx + 1)]
 });
 
-export const store = new StoreBuilder()
-    .addReducer('todos', TodoReducer)
-    .build();
+const store = createStore(combineReducers({ 'todos': TodoReducer }));
+const actionCreators = createActionCreators(TodoReducer);
 
-type Dispatch = StoreDispatchType<typeof store>;
+type Dispatch = typeof store.dispatch;
 
 interface TodoProps {
     item: TodoItem;
