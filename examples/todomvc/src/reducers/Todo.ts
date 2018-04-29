@@ -1,26 +1,31 @@
-import { createReducer } from 'typeful-redux';
+import { createReducer, createActionCreators, BoundCreatorsFromActionCreators } from '../../../../src';
 
 export interface TodoItem {
     task: string;
     completed: boolean;
 }
 
-export const TodoReducer = createReducer([] as TodoItem[])
-    ('add', (s: TodoItem[], task: string) => [...s, { task, completed: false }])
-    ('clear', (_s: TodoItem[]) => [])
-    ('clearCompleted', (s: TodoItem[]) => s.filter(item => !item.completed))
-    ('toggle', (s: TodoItem[], idx: number) => [
+const handler = {
+    ADD_TODO: (s: TodoItem[], task: string) => [...s, { task, completed: false }],
+    CLEAR_TODOS: (_s: TodoItem[]) => [],
+    CLEAR_COMPLETED: (s: TodoItem[]) => s.filter(item => !item.completed),
+    TOGGLE_TODO: (s: TodoItem[], idx: number) => [
         ...s.slice(0, idx),
         { task: s[idx].task, completed: !s[idx].completed },
         ...s.slice(idx + 1)
-    ])
-    ('edit', (s: TodoItem[], p: { idx: number; task: string; }) => [
+    ],
+    EDIT_TODO: (s: TodoItem[], p: { idx: number; task: string; }) => [
         ...s.slice(0, p.idx),
         { ...s[p.idx], task: p.task },
         ...s.slice(p.idx + 1)
-    ])
-    ('remove', (s: TodoItem[], idx: number) => [
+    ],
+    REMOVE_TODO: (s: TodoItem[], idx: number) => [
         ...s.slice(0, idx), ...s.slice(idx + 1)
-    ]);
+    ]
+};
 
-export type TodoDispatch = typeof TodoReducer.__dispatchType;
+const initialState: TodoItem[] = [];
+
+export const reducer = createReducer(initialState, handler);
+export const actionCreators = createActionCreators(handler);
+export type Dispatch = BoundCreatorsFromActionCreators<typeof actionCreators>;

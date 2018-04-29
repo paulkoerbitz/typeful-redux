@@ -1,24 +1,26 @@
 import 'todomvc-app-css/index.css';
 import * as React from 'react';
 import { render } from 'react-dom';
-import { StoreBuilder, connect } from 'typeful-redux';
-import { TodoReducer } from './reducers/Todo';
-import { FilterReducer } from './reducers/Filter';
+import { createStore, combineReducers, bindActionCreators, connect, StoreState } from '../../../src';
+import * as Todo from './reducers/Todo';
+import * as Filter from './reducers/Filter';
 import { TodoListComponent } from './components/TodoList';
 
-const store = new StoreBuilder()
-    .addReducer('todos', TodoReducer)
-    .addReducer('filter', FilterReducer)
-    .build();
+const reducer = combineReducers({
+    todos: Todo.reducer,
+    filter: Filter.reducer
+});
 
-const fakeState = (false as true) && store.getState();
-type State = typeof fakeState;
+const store = createStore(reducer);
+
+type State = StoreState<typeof store>;
 type Dispatch = typeof store.dispatch;
 
 const mapStateToProps = (state: State) => state;
 
-const mapDisptachToProps = (dispatch: Dispatch) => ({
-    ...dispatch.todos, ...dispatch.filter
+const mapDisptachToProps = (dispatch: Dispatch): Todo.Dispatch & Filter.Dispatch => ({
+    ...bindActionCreators(Todo.actionCreators, dispatch),
+    ...bindActionCreators(Filter.actionCreators, dispatch)
 });
 
 const TodoListContainer =

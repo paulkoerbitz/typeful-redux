@@ -1,10 +1,15 @@
-import { createReducer } from 'typeful-redux';
+import { createReducer, createActionCreators, BoundCreatorsFromActionCreators } from '../../../../src';
 
 export type FilterType = 'all' | 'active' | 'completed';
 
-export const FilterReducer = createReducer('all' as FilterType)
-    ('all', _s => 'all')
-    ('active', _s => 'active')
-    ('completed', _s => 'completed');
+const initialState: FilterType = 'all';
 
-export type FilterDispatch = typeof FilterReducer.__dispatchType;
+const handler = {
+    FILTER_ALL: (_s: FilterType) => 'all',
+    FILTER_ACTIVE: (_s: FilterType) => 'active',
+    FILTER_COMPLETED: (_s: FilterType) => 'completed'
+};
+
+export const reducer = createReducer(initialState, handler);
+export const actionCreators = createActionCreators(handler);
+export type Dispatch = BoundCreatorsFromActionCreators<typeof actionCreators>;
