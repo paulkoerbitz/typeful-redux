@@ -61,10 +61,5 @@
             "json",
             "node"
         ]
-    },
-    "dependencies": {
-        "@types/react": "^16.3.11",
-        "@types/redux-saga": "^0.10.5",
-        "redux-saga": "^0.16.0"
     }
 }
