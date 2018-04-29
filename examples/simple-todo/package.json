@@ -7,7 +7,6 @@
         "react-dom": "^16.2.0",
         "react-redux": "^5.0.6",
         "redux": "^3.7.2",
-        "reveal.js": "^3.6.0",
         "ts-loader": "^3.5.0",
         "typeful-redux": "../..",
         "typescript": "^2.8.0",

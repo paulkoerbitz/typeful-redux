@@ -21,7 +21,7 @@ module.exports = function () {
     };
     var modules = {
         loaders: [{
-            test: /\.tsx$/,
+            test: /\.tsx?$/,
             loader: 'ts-loader',
             exclude: ['node_modules', 'test', 'script']
         }]
