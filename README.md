@@ -40,7 +40,7 @@ const store = createStore(
     combineReducers({ todos: todoReducer })
 );
 
-// The state has type: { todos: TodoItem[] }
+// The state has type: { todos: Todo[] }
 const state = store.getState();
 
 // type error: action has the wrong form - expected just { type: 'CLEAR' }
