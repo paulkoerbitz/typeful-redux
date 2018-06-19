@@ -3,10 +3,10 @@ import { expect } from 'chai';
 import { createReducer } from '../src';
 
 describe('createReducer', () => {
-    it('getInitial() returns the inital state', () => {
+    it('', () => {
         const initialState = { a_key: "a value" };
-        const reducer = createReducer(initialState);
-        expect(reducer.getInitial()).to.deep.equal(initialState);
+        const reducer = createReducer(initialState, {});
+        expect(reducer).to.deep.equal(initialState);
     });
 
     it('getReducer() initially returns an empty map', () => {

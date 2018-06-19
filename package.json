@@ -3,7 +3,7 @@
     "version": "0.3.0",
     "description": "A typesafe, low boilerplate wrapper for redux to be used in TypeScript projects",
     "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "types": "dist",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/paulkoerbitz/typeful-redux"
@@ -32,6 +32,7 @@
         "@types/react-redux": "^5.0.16",
         "@types/redux": "^3.6.0",
         "chai": "^4.1.2",
+        "dtslint": "^0.3.0",
         "jest": "^22.4.3",
         "mocha": "^4.0.1",
         "react": "^16.3.1",
@@ -46,7 +47,8 @@
         "build": "tsc",
         "test": "mocha --require ts-node/register --watch-extensions ts,tsx \"test/**/*.ts\"",
         "typecheck": "tsc -w --noEmit",
-        "prepare": "tsc"
+        "prepare": "tsc",
+        "dtslint": "dtslint test/types"
     },
     "jest": {
         "transform": {

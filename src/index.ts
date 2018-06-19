@@ -2,7 +2,6 @@ import * as redux from 'redux';
 import { connect as redux_connect } from 'react-redux';
 import { Reducer, CombineReducers, Connect, CreateStore} from './types';
 import {
-    StateFromHandlerMap,
     ActionsFromHandlerMap,
     ActionCreatorsFromHandlerMap,
     ActionsFromActionCreators,
@@ -10,16 +9,17 @@ import {
 } from './type-converters';
 
 export const createReducer = <
+    State,
     HandlerMap extends { [key in string]: (...xs: any[]) => any }
 >(
-    initialState: StateFromHandlerMap<HandlerMap>,
+    initialState: State,
     handlerMap: HandlerMap
 ): Reducer<
-    StateFromHandlerMap<HandlerMap>,
+    State,
     ActionsFromHandlerMap<HandlerMap>
 > => {
     return (
-        s: StateFromHandlerMap<HandlerMap>,
+        s: State,
         action: ActionsFromHandlerMap<HandlerMap>
     ) => {
         if (action.type in handlerMap) {
