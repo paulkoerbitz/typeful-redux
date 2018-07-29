@@ -32,13 +32,12 @@
         "@types/react-redux": "^5.0.16",
         "@types/redux": "^3.6.0",
         "chai": "^4.1.2",
-        "dtslint": "^0.3.0",
         "jest": "^22.4.3",
         "mocha": "^4.0.1",
         "react": "^16.3.1",
         "react-redux": "^5.0.7",
         "redux": "^3.x",
-        "resolve-types": "^0.1.2",
+        "resolve-types": "^0.2.0",
         "ts-jest": "^22.4.2",
         "ts-node": "^3.3.0",
         "typedoc": "^0.9.0",
@@ -52,6 +51,7 @@
         "dtslint": "dtslint test/types"
     },
     "jest": {
+	"testURL": "http://localhost/",
         "transform": {
             "^.+\\.tsx?$": "ts-jest"
         },
