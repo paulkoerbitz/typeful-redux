@@ -4,10 +4,7 @@ import { resolveTypes } from 'resolve-types';
 describe('Type Operators', () => {
     describe('Arg1', () => {
         const {
-            __1,
-            __2,
-            __3,
-            __4
+            types: { __1, __2, __3, __4 }
         } = resolveTypes`
             import * as TH from './src/type-helpers';
             type __1 = TH.Arg1<(x: string) => void>;
@@ -34,13 +31,7 @@ describe('Type Operators', () => {
     });
 
     describe('Arg2', () => {
-        const {
-            __1,
-            __2,
-            __3,
-            __4,
-            __5
-        } = resolveTypes`
+        const { types: { __1, __2, __3, __4, __5 } } = resolveTypes`
             import * as TH from './src/type-helpers';
             type __1 = TH.Arg2<(x: string, y: number) => void>;
             type __2 = TH.Arg2<(x: string) => void>;
@@ -49,32 +40,32 @@ describe('Type Operators', () => {
             type __5 = TH.Arg2<{ x: string; y: number }>;
         `;
 
-        it("returns the type of the second argument for a binary function", () => {
-            expect(__1).toEqual("number");
+        it('returns the type of the second argument for a binary function', () => {
+            expect(__1).toEqual('number');
         });
 
-        it("returns never for a uniary function", () => {
-            expect(__2).toEqual("never");
+        it('returns never for a uniary function', () => {
+            expect(__2).toEqual('never');
         });
 
-        it("returns the type of the second argument for a trinary function", () => {
-            expect(__3).toEqual("number");
+        it('returns the type of the second argument for a trinary function', () => {
+            expect(__3).toEqual('number');
         });
 
-        it("returns never for a nullary function", () => {
-            expect(__4).toEqual("never");
+        it('returns never for a nullary function', () => {
+            expect(__4).toEqual('never');
         });
 
-        it("returns never for a non-function", () => {
-            expect(__5).toEqual("never");
+        it('returns never for a non-function', () => {
+            expect(__5).toEqual('never');
         });
     });
 });
 
-describe("Type Converters", () => {
-    describe("ActionsFromHandlerMap", () => {
-        it("extracts a simple action", () => {
-            const { __1 } = resolveTypes`
+describe('Type Converters', () => {
+    describe('ActionsFromHandlerMap', () => {
+        it('extracts a simple action', () => {
+            const { types: { __1 } } = resolveTypes`
                 import { ActionsFromHandlerMap } from './src/type-converters';
                 type __1 = ActionsFromHandlerMap<{ Action1: (state: string[], payload: string) => string[]; }>;
             `;
@@ -82,5 +73,5 @@ describe("Type Converters", () => {
         });
     });
 
-    describe("ActionCreatorsFromHandlerMap", () => {});
+    describe('ActionCreatorsFromHandlerMap', () => {});
 });
