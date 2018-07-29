@@ -16,7 +16,7 @@
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "outDir": "dist/",
-        "lib": ["es5"]
+        "lib": ["es5", "dom"]
     },
     "files": [
         "src/index.ts"
