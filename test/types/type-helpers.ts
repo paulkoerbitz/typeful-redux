@@ -1,32 +1,96 @@
-// This will fail ;)
-// $ExpectType string
-type Test_01_number_is_not_string = number;
+import { resolveTypes } from 'resolve-types';
 
-import { Arg1, Arg2, Equals } from '../../src/type-helpers';
+describe('type-helpers', () => {
+    describe('Arg1', () => {
+        const {
+            types: { __1, __2, __3, __4 },
+            diagnostics
+        } = resolveTypes`
+            import { Arg1 } from './src/type-helpers';
+            type ${1} = Arg1<(x: string) => void>;
+            type ${2} = Arg1<(x: number, y: string) => void>;
+            type ${3} = Arg1<() => void>;
+            type ${4} = Arg1<string | undefined>;
+        `;
 
-// $ExpectType string
-type Arg1_extracts_arg1_from_unary_function = Arg1<(x: string) => void>;
+        it('correctly infers the first argument type of a unary function', () => {
+            expect(diagnostics).toEqual([]);
+            expect(__1).toEqual('string');
+        });
 
-// $ExpectType string
-type Arg1_extracts_arg1_from_binary_function = Arg1<(x: string, y: number) => void>;
+        it('correctly infers the first argument type of a binary function', () => {
+            expect(diagnostics).toEqual([]);
+            expect(__2).toEqual('number');
+        });
 
-// $ExpectType never
-type Arg1_extracts_never_from_nullary_function = Arg1<() => void>;
+        it('returns type "never" for a nullary function', () => {
+            expect(diagnostics).toEqual([]);
+            expect(__3).toEqual('never');
+        });
 
-// $ExpectType string
-type Arg2_extracts_arg2_from_binary_function = Arg2<(x: number, y: string) => void>;
+        it('returns type "never" for a non-function', () => {
+            expect(diagnostics).toEqual([]);
+            expect(__4).toEqual('never');
+        });
+    });
 
-// $ExpectType string
-type Arg2_extracts_arg2_from_trinary_function = Arg2<(x: number, y: string, z: number) => void>;
+    describe('Arg2', () => {
+        const {
+            types: { __1, __2, __3, __4, __5 },
+            diagnostics
+        } = resolveTypes`
+            import { Arg2 } from './src/type-helpers';
+            type ${1} = Arg2<(x: string, y: { foo: string; }) => void>;
+            type ${2} = Arg2<(x: number, y: { bar: number; }, z: string) => void>;
+            type ${3} = Arg2<(x: any) => void>;
+            type ${4} = Arg2<() => void>;
+            type ${5} = Arg2<string | {}>;
+        `;
 
-// $ExpectType never
-type Arg2_extracts_never_from_unary_function = Arg2<(x: number) => void>;
+        it('correctly infers the second argument type of a binary function', () => {
+            expect(diagnostics).toEqual([]);
+            expect(__1).toEqual('{ foo: string; }');
+        });
 
-// $ExpectType never
-type Arg2_extracts_never_from_nullary_function = Arg2<() => void>;
+        it('correctly infers the second argument type of a trinary function', () => {
+            expect(diagnostics).toEqual([]);
+            expect(__2).toEqual('{ bar: number; }');
+        });
 
-// $ExpectType true
-type Equals_string_string_is_true = Equals<string, string>;
+        it('returns type "never" for a unary function', () => {
+            expect(diagnostics).toEqual([]);
+            expect(__3).toEqual('never');
+        });
 
-// $ExpectType false
-type Equals_string_number_is_false = Equals<string, number>;
+        it('returns type "never" for a nullary function', () => {
+            expect(diagnostics).toEqual([]);
+            expect(__4).toEqual('never');
+        });
+
+        it('returns type "never" for a non-function', () => {
+            expect(diagnostics).toEqual([]);
+            expect(__5).toEqual('never');
+        });
+    });
+
+    describe('Equals', () => {
+        const {
+            types: { __1, __2 },
+            diagnostics
+        } = resolveTypes`
+            import { Equals } from './src/type-helpers';
+            type ${1} = Equals<string, string>;
+            type ${2} = Equals<string, number>;
+        `;
+
+        it('Equals<string, string> resolves to true', () => {
+            expect(diagnostics).toEqual([]);
+            expect(__1).toEqual('true');
+        });
+
+        it('Equals<string, number> resolves to false', () => {
+            expect(diagnostics).toEqual([]);
+            expect(__2).toEqual('false');
+        });
+    })
+});

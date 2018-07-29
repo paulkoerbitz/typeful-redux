@@ -10,7 +10,7 @@ export type ActionFromPayload<
 >;
 
 export type BoundActionCreatorFromPayload<
-    ActionName extends string,
+    ActionName,
     P extends ActionName | void | string | object
 > = If<
     Or<Equals<P, ActionName>, Equals<P, void>>,
