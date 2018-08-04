@@ -1,5 +1,7 @@
 # typeful-redux
 
+[![npm version](https://img.shields.io/npm/v/typeful-redux.svg?style=flat-square)](https://www.npmjs.com/package/typeful-redux)
+
 A type-safe, low boilerplate wrapper for redux to be used in TypeScript projects.
 
 ## Elevator pitch
