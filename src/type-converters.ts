@@ -1,4 +1,5 @@
 import { Arg1, Arg2, Equals, If, Or } from './type-helpers';
+import { HandlerMap } from './types';
 
 export type ActionFromPayload<
     ActionName,
@@ -24,12 +25,18 @@ export type StateFromHandlerMap<
     [ActionName in keyof HandlerMap]: Arg1<HandlerMap[ActionName]>
 }[keyof HandlerMap];
 
-export type ActionsFromHandlerMap<HandlerMap> = {
-    [ActionName in keyof HandlerMap]: ActionFromPayload<
+export type ActionFromHandlerMapEntry<ActionName, HmEntry> = HmEntry extends (
+    ...xs: any[]
+) => any
+    ? ActionFromPayload<ActionName, Arg2<HmEntry>>
+    : { type: ActionName };
+
+export type ActionsFromHandlerMap<State, HM extends HandlerMap<State>> = {
+    [ActionName in keyof HM]: ActionFromHandlerMapEntry<
         ActionName,
-        Arg2<HandlerMap[ActionName]>
+        HM[ActionName]
     >
-}[keyof HandlerMap];
+}[keyof HM];
 
 export type ActionCreatorFromPayload<
     ActionName,
@@ -40,10 +47,20 @@ export type ActionCreatorFromPayload<
     (payload: Payload) => { type: ActionName; payload: Payload }
 >;
 
-export type ActionCreatorsFromHandlerMap<HandlerMap> = {
-    [ActionName in keyof HandlerMap]: ActionCreatorFromPayload<
+export type ActionCreatorFromHandlerMapEntry<
+    ActionName,
+    HmEntry
+> = HmEntry extends (...xs: any[]) => any
+    ? ActionCreatorFromPayload<ActionName, Arg2<HmEntry>>
+    : (() => { type: ActionName });
+
+export type ActionCreatorsFromHandlerMap<
+    State,
+    HM extends HandlerMap<State>
+> = {
+    [ActionName in keyof HM]: ActionCreatorFromHandlerMapEntry<
         ActionName,
-        Arg2<HandlerMap[ActionName]>
+        HM[ActionName]
     >
 };
 
