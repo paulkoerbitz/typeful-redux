@@ -25,10 +25,24 @@ export type HandlerMap<State, HM> = {
     [K in keyof HM]: HandlerType<State, HM[K]>
 };
 
+export type HMValueConstrant<State> =
+    | State
+    | MaybePartial<State>
+    | (() => MaybePartial<State>)
+    | ((payload: any) => MaybePartial<State>)
+    | ((state: State, payload: any) => MaybePartial<State>);
+
+export type HMConstraint<State> = {
+    [key: string]: HMValueConstrant<State>;
+};
+
 /**
  * Type-annotate a map from action names to handling functions
  */
-export const createHandlerMap = <State, HM>(
+export const createHandlerMap = <
+    State,
+    HM extends HMConstraint<State>
+>(
     initialState: State,
     handlerMap: HM
 ): HandlerMap<State, HM> => {
