@@ -126,4 +126,24 @@ describe('Handler Map', () => {
             });
         });
     }
+
+    describe('createHandlerMap creates actions with never type', () => {
+        it('a wrong is returned from a setter', () => {
+            const { types } = resolveTypes`
+                import { createHandlerMap, HandlerType } from './src/handler-map';
+
+                type Foo = number[];
+                const initialState = [] as Foo;
+
+                const stringLiteralHandlerMap = createHandlerMap(initialState, {
+                    SET_FOO: 'foo',
+                    SET_BAR: () => 'bar',
+                    SET_QUOX: (x: number) => 'bar',
+                    SET_BAAZ: (s, x: number) => 'bar',
+                });
+                type __wrongHandlerType = typeof stringLiteralHandlerMap;
+            `;
+            expect(types['__wrongHandlerType']).toEqual('{ SET_FOO: never; SET_BAR: never; SET_QUOX: never; SET_BAAZ: never; }');
+        });
+    });
 });
