@@ -32,11 +32,7 @@ export const createReducer = <
         const oldS = s === undefined ? initialState : s;
         let newS = handler;
         if (typeof handler === 'function') {
-            if ((handler as any).length === 1) {
-                newS = (handler as any)((action as any).payload);
-            } else {
-                newS = (handler as any)(s, (action as any).payload);
-            }
+            newS = (handler as any)(s, (action as any).payload);
         }
         if (
             typeof newS === 'number' ||

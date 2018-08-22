@@ -90,7 +90,7 @@ describe('Handler Map', () => {
                 type __nullarySetterHandlerMapType = typeof nullarySetterHandlerMap;
 
                 const unarySetterHandlerMap = createHandlerMap(initialState, {
-                    SET_QUOX: (x: number) => (x > 0 ? ${bar} : ${quox}),
+                    SET_QUOX: s => (s === ${foo} ? ${bar} : ${quox}),
                 });
                 type __unarySetterHandlerMapType = typeof unarySetterHandlerMap;
 
@@ -102,7 +102,7 @@ describe('Handler Map', () => {
                 const allTogetherHandlerMap = createHandlerMap(initialState, {
                     SET_FOO: ${foo}${returnTypeAnnotation} ,
                     SET_BAR: () => (${bar}${returnTypeAnnotation}),
-                    SET_QUOX: (x: number) => (x > 0 ? ${bar} : ${quox}),
+                    SET_QUOX: s => (s === ${foo} ? ${bar} : ${quox}),
                     SET_BAAZ: (s, x: number) => (x > 0 ? ${bar} : ${quox}),
                 });
                 type __allTogetherHandlerMapType = typeof allTogetherHandlerMap;
@@ -132,7 +132,7 @@ describe('Handler Map', () => {
 
             it('has correct types for a unary setter function', () => {
                 expect(types['__unarySetterHandlerMapType']).toEqual(
-                    `{ SET_QUOX: (payload: number) => ${expectedOut}; }`
+                    `{ SET_QUOX: (state: ${expectedIn}) => ${expectedOut}; }`
                 );
             });
 
@@ -144,7 +144,7 @@ describe('Handler Map', () => {
 
             it('has correct types for all handlers together', () => {
                 expect(types['__allTogetherHandlerMapType']).toEqual(
-                    `{ SET_FOO: ${expectedOut}; SET_BAR: () => ${expectedOut}; SET_QUOX: (payload: number) => ${expectedOut}; SET_BAAZ: (state: ${expectedIn}, payload: number) => ${expectedOut}; }`
+                    `{ SET_FOO: ${expectedOut}; SET_BAR: () => ${expectedOut}; SET_QUOX: (state: ${expectedIn}) => ${expectedOut}; SET_BAAZ: (state: ${expectedIn}, payload: number) => ${expectedOut}; }`
                 );
             });
         });
@@ -307,7 +307,7 @@ describe('Handler Map', () => {
 
         type __StateInferredHm = StateFromHandlerMap<typeof map>;
 
-        type __Actions = ActionsFromHandlerMap<__StateConstructedHm, typeof constructedHm>;
+        type __Actions = ActionsFromHandlerMap<typeof constructedHm>;
     `;
 
         describe('StateFromHandlerMap', () => {
@@ -322,7 +322,7 @@ describe('Handler Map', () => {
 
         describe('ActionsFromHandlerMap', () => {
             it('extracts the right actions from a given handler map', () => {
-                expect(types['__Actions']).toEqual("{ type: \"FOO\"; } | { type: \"BAR\"; } | { type: \"SET\"; payload: number; } | { type: \"QUOX\"; payload: number; }");
+                expect(types['__Actions']).toEqual("{ type: \"FOO\"; } | { type: \"BAR\"; } | { type: \"SET\"; } | { type: \"QUOX\"; payload: number; }");
             });
         });
     });

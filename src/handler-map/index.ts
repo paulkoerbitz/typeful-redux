@@ -1,13 +1,5 @@
 import { INITIAL_STATE_KEY } from '../constants';
-import {
-    Arg1,
-    Arg2,
-    IfArity2,
-    If,
-    Or,
-    Equals,
-    IfArity1
-} from '../types/helpers';
+import { Arg2, IfArity2, If, Or, Equals } from '../types/helpers';
 
 export type NonObjectOrFunction =
     | string
@@ -23,8 +15,8 @@ export type HandlerType<State, T> = T extends NonObjectOrFunction
     ? State extends T ? State : never
     : T extends (() => MaybePartial<State>)
         ? (() => MaybePartial<State>)
-        : T extends ((payload: any) => MaybePartial<State>)
-            ? (payload: Arg1<T>) => MaybePartial<State>
+        : T extends ((state: State) => MaybePartial<State>)
+            ? (state: State) => MaybePartial<State>
             : T extends ((state: State, payload: any) => MaybePartial<State>)
                 ? ((state: State, payload: Arg2<T>) => MaybePartial<State>)
                 : T extends MaybePartial<State> ? MaybePartial<State> : never;
@@ -34,9 +26,10 @@ export type HandlerMap<State, HM> = {
 };
 
 export type HandlerMapValueConstraint<State> =
+    | State
     | MaybePartial<State>
     | (() => MaybePartial<State>)
-    | ((payload: any) => MaybePartial<State>)
+    | ((state: State) => MaybePartial<State>)
     | ((state: State, payload: any) => MaybePartial<State>);
 
 export type HandlerMapConstraint<State> = {
@@ -57,8 +50,8 @@ export const createHandlerMap = <State, HM extends HandlerMapConstraint<State>>(
 };
 
 export type StateFromHandlerMap<
-    HM extends HandlerMapConstraint<any>
-> = HM extends HandlerMapConstraint<infer State> ? State : never;
+    HM extends HandlerMap<any, HM>
+> = HM extends HandlerMap<infer State, HM> ? State : never;
 
 export type ActionFromPayload<
     ActionName,
@@ -75,14 +68,10 @@ export type ActionFromHandlerMapEntry<
 > = IfArity2<
     HmEntry,
     ActionFromPayload<ActionName, Arg2<HmEntry>>,
-    IfArity1<
-        HmEntry,
-        ActionFromPayload<ActionName, Arg1<HmEntry>>,
-        { type: ActionName }
-    >
+    { type: ActionName }
 >;
 
-export type ActionsFromHandlerMap<State, HM extends HandlerMapConstraint<State>> = {
+export type ActionsFromHandlerMap<HM extends HandlerMapConstraint<any>> = {
     [ActionName in keyof HM]: ActionFromHandlerMapEntry<
         ActionName,
         HM[ActionName]

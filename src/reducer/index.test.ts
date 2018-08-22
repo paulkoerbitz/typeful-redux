@@ -102,23 +102,23 @@ describe('createReducer', () => {
 
         it('correctly handles updates for handlers which are unary functions', () => {
             const initialState = { a: 3, b: 'initial b' };
-            const handlerMap = {
-                foo: (x: number) => ({ a: x, b: 'b set by foo' }),
-                bar: (s: string) => ({ b: s })
-            };
-            const reducer = createReducer(createHandlerMap(initialState, handlerMap));
+            const handlerMap = createHandlerMap(initialState, {
+                foo: s => ({ a: s.a + 1, b: 'b set by foo' }),
+                bar: s => ({ b: s.b + ' and bar!' })
+            });
+            const reducer = createReducer(handlerMap);
 
             const stateAfterFoo = reducer(
                 { a: 5, b: 'different b' },
-                { type: 'foo', payload: 10 }
+                { type: 'foo' }
             );
-            expect(stateAfterFoo).toEqual({ a: 10, b: 'b set by foo' });
+            expect(stateAfterFoo).toEqual({ a: 6, b: 'b set by foo' });
 
             const stateAfterBar = reducer(
                 { a: 5, b: 'different b' },
-                { type: 'bar', payload: 'hello!!!' }
+                { type: 'bar' }
             );
-            expect(stateAfterBar).toEqual({ a: 5, b: 'hello!!!' });
+            expect(stateAfterBar).toEqual({ a: 5, b: 'different b and bar!' });
         });
 
         it('correctly handles updates for handlers which are binary functions', () => {
