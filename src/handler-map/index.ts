@@ -1,26 +1,6 @@
 import { INITIAL_STATE_KEY } from '../constants';
 import { Arg1, Arg2 } from '../types/helpers';
 
-
-export type StateFromHandlerMap<
-    HandlerMap extends { [key in string]: (...xs: any[]) => any }
-> = {
-    [ActionName in keyof HandlerMap]: Arg1<HandlerMap[ActionName]>
-}[keyof HandlerMap];
-
-export type ActionFromHandlerMapEntry<ActionName, HmEntry> = HmEntry extends (
-    ...xs: any[]
-) => any
-    ? ActionFromPayload<ActionName, Arg2<HmEntry>>
-    : { type: ActionName };
-
-export type ActionsFromHandlerMap<State, HM extends HandlerMapConstraint<State>> = {
-    [ActionName in keyof HM]: ActionFromHandlerMapEntry<
-        ActionName,
-        HM[ActionName]
-    >
-}[keyof HM];
-
 export type NonObjectOrFunction =
     | string
     | number
@@ -46,7 +26,6 @@ export type HandlerMap<State, HM> = {
 };
 
 export type HandlerMapValueConstraint<State> =
-    | State
     | MaybePartial<State>
     | (() => MaybePartial<State>)
     | ((payload: any) => MaybePartial<State>)
@@ -71,3 +50,20 @@ export const createHandlerMap = <
         ...(handlerMap as any)
     } as any;
 };
+
+export type StateFromHandlerMap<HM extends HandlerMapConstraint<any>> =
+    HM extends HandlerMapConstraint<infer State> ? State : never;
+
+// export type ActionFromHandlerMapEntry<ActionName, HmEntry> = HmEntry extends (
+//     ...xs: any[]
+// ) => any
+//     ? ActionFromPayload<ActionName, Arg2<HmEntry>>
+//     : { type: ActionName };
+
+// export type ActionsFromHandlerMap<State, HM extends HandlerMapConstraint<State>> = {
+//     [ActionName in keyof HM]: ActionFromHandlerMapEntry<
+//         ActionName,
+//         HM[ActionName]
+//     >
+// }[keyof HM];
+

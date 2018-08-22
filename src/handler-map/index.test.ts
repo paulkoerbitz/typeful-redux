@@ -1,6 +1,6 @@
 import 'jest';
 import { createHandlerMap } from '.';
-import { INITIAL_STATE_KEY } from './constants';
+import { INITIAL_STATE_KEY } from '../constants';
 import { resolveTypes, setOptions } from 'resolve-types';
 import { Diagnostic } from 'typescript';
 
@@ -268,7 +268,7 @@ describe('Handler Map', () => {
                         handlerType: string,
                         stateType: string
                     ) =>
-                        `Argument of type '${handlerType}' is not assignable to parameter of type 'HMConstraint<${stateType}>'.`;
+                        `Argument of type '${handlerType}' is not assignable to parameter of type 'HandlerMapConstraint<${stateType}>'.`;
 
                     expectToEqualWithSynonyms(
                         message,
@@ -278,5 +278,28 @@ describe('Handler Map', () => {
                 });
             }
         }
+    });
+
+    describe('StateFromHandlerMap', () => {
+        it('correctly extracts the type from a given handler map', () => {
+            const { types, diagnostics } = resolveTypes`
+                import { createHandlerMap, StateFromHandlerMap } from './src/handler-map';
+
+                const initial = 3 as string | number;
+                const map = {
+                    FOO: () => 3,
+                    BAR: "hi there",
+                    SET: (payload: number) => payload,
+                    QUOX: (state, payload: number) => payload > 3 ? payload : state
+                };
+                const constructedHm = createHandlerMap(initial, map);
+                type __StateConstructedHm = StateFromHandlerMap<typeof constructedHm>;
+
+                type __StateInferredHm = StateFromHandlerMap<typeof map>;
+            `;
+            expect(getDiagnosticMessages(diagnostics)).toEqual([]);
+            expect(types["__StateConstructedHm"]).toEqual("string | number");
+            expect(types["__StateInferredHm"]).toEqual("any");
+        });
     });
 });
