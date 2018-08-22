@@ -19,21 +19,24 @@ export interface CombineReducers {
 }
 
 export const createReducer = <
-    State,
-    HM extends HandlerMapConstraint<State>
+    HM extends HandlerMapConstraint<any>
 >(
     handlerMap: HM
-): Reducer<StateFromHandlerMap<HM>, ActionsFromHandlerMap<State, HM>> => {
+): Reducer<StateFromHandlerMap<HM>, ActionsFromHandlerMap<HM>> => {
     const initialState = (handlerMap as any)[INITIAL_STATE_KEY];
     return (
         s: StateFromHandlerMap<HM> | undefined,
-        action: ActionsFromHandlerMap<State, HM>
+        action: ActionsFromHandlerMap<HM>
     ): StateFromHandlerMap<HM> => {
         const handler = handlerMap[action.type];
         const oldS = s === undefined ? initialState : s;
         let newS = handler;
         if (typeof handler === 'function') {
-            newS = (handler as any)(s, (action as any).payload);
+            if ((handler as any).length === 1) {
+                newS = (handler as any)((action as any).payload);
+            } else {
+                newS = (handler as any)(s, (action as any).payload);
+            }
         }
         if (
             typeof newS === 'number' ||
