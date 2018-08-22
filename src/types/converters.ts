@@ -1,4 +1,4 @@
-import { Arg1, Arg2, Equals, If, Or } from './type-helpers';
+import { Arg1, Arg2, Equals, If, Or } from './helpers';
 import { HandlerMap } from './types';
 
 export type ActionFromPayload<

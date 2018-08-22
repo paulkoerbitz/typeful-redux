@@ -1,5 +1,5 @@
 import 'jest';
-import { createHandlerMap } from './handler-map';
+import { createHandlerMap } from '.';
 import { INITIAL_STATE_KEY } from './constants';
 import { resolveTypes, setOptions } from 'resolve-types';
 import { Diagnostic } from 'typescript';

@@ -1,5 +1,5 @@
-import { INITIAL_STATE_KEY } from './constants';
-import { Arg1, Arg2 } from './type-helpers';
+import { INITIAL_STATE_KEY } from '../constants';
+import { Arg1, Arg2 } from '../types/helpers';
 
 
 export type StateFromHandlerMap<

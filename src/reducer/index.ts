@@ -1,7 +1,8 @@
 import * as Redux from 'redux';
-import { Arg1, Arg2 } from './type-helpers';
-import { ActionsFromHandlerMap } from "./type-converters";
-import { INITIAL_STATE_KEY } from "./constants";
+import { Arg1, Arg2 } from '../types/helpers';
+import { ActionsFromHandlerMap } from "../type-converters";
+import { INITIAL_STATE_KEY } from "../constants";
+import { HandlerMapConstraint } from '../handler-map';
 
 export type Reducer<State, Action extends Redux.Action> = Redux.Reducer<
     State,
@@ -19,7 +20,7 @@ export interface CombineReducers {
 
 export const createReducer = <
     State,
-    HM
+    HM extends HandlerMapConstraint<State>
 >(
     handlerMap: HM
 ): Reducer<State, ActionsFromHandlerMap<State, HM>> => {

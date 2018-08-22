@@ -1,10 +1,10 @@
-import { HandlerMap } from "./handler-map";
+import { HandlerMap } from "../handler-map";
 
 export const createActionCreators = <
     State,
     HM extends HandlerMap<State>
 >(
-    handlerMap: HM & { (): State }
+    handlerMap: HM
 ): ActionCreatorsFromHandlerMap<State, HM> => {
     const result: any = {};
     for (const type in handlerMap) {
