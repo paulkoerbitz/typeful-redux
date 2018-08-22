@@ -176,7 +176,10 @@ describe('Handler Map', () => {
                 },
                 typeSynonyms: {
                     state: ['Foo'],
-                    invalid: ['{ a: string; }', '{ a: number; b: string; c: { d: number; }; }']
+                    invalid: [
+                        '{ a: string; }',
+                        '{ a: number; b: string; c: { d: number; }; }'
+                    ]
                 }
             }
         ];
@@ -231,13 +234,21 @@ describe('Handler Map', () => {
                     it => `{ UNARY: (payload: number) => ${it}; }`
                 ],
                 [
-                    `{ BINARY: (state: ${typeSynonyms.state[0]}, payload: number) => (${values.invalid}) }`,
-                    it => `{ BINARY: (state: ${typeSynonyms.state[0]}, payload: number) => ${it}; }`
+                    `{ BINARY: (state: ${
+                        typeSynonyms.state[0]
+                    }, payload: number) => (${values.invalid}) }`,
+                    it =>
+                        `{ BINARY: (state: ${
+                            typeSynonyms.state[0]
+                        }, payload: number) => ${it}; }`
                 ],
                 // Invalid state parameter
                 [
-                    `{ BINARY: (state: number, payload: number) => (${values.valid}) }`,
-                    it => `{ BINARY: (state: number, payload: number) => ${it}; }`
+                    `{ BINARY: (state: number, payload: number) => (${
+                        values.valid
+                    }) }`,
+                    it =>
+                        `{ BINARY: (state: number, payload: number) => ${it}; }`
                 ]
             ].map(
                 ([handlerMap, typesCreator]: [string, (x: string) => string]) =>
@@ -280,26 +291,39 @@ describe('Handler Map', () => {
         }
     });
 
-    describe('StateFromHandlerMap', () => {
-        it('correctly extracts the type from a given handler map', () => {
-            const { types, diagnostics } = resolveTypes`
-                import { createHandlerMap, StateFromHandlerMap } from './src/handler-map';
+    describe('type operators', () => {
+        const { types, diagnostics } = resolveTypes`
+        import { createHandlerMap, StateFromHandlerMap, ActionsFromHandlerMap } from './src/handler-map';
 
-                const initial = 3 as string | number;
-                const map = {
-                    FOO: () => 3,
-                    BAR: "hi there",
-                    SET: (payload: number) => payload,
-                    QUOX: (state, payload: number) => payload > 3 ? payload : state
-                };
-                const constructedHm = createHandlerMap(initial, map);
-                type __StateConstructedHm = StateFromHandlerMap<typeof constructedHm>;
+        const initial = 3 as string | number;
+        const map = {
+            FOO: () => 3,
+            BAR: "hi there",
+            SET: (payload: number) => payload,
+            QUOX: (state, payload: number) => payload > 3 ? payload : state
+        };
+        const constructedHm = createHandlerMap(initial, map);
+        type __StateConstructedHm = StateFromHandlerMap<typeof constructedHm>;
 
-                type __StateInferredHm = StateFromHandlerMap<typeof map>;
-            `;
-            expect(getDiagnosticMessages(diagnostics)).toEqual([]);
-            expect(types["__StateConstructedHm"]).toEqual("string | number");
-            expect(types["__StateInferredHm"]).toEqual("any");
+        type __StateInferredHm = StateFromHandlerMap<typeof map>;
+
+        type __Actions = ActionsFromHandlerMap<__StateConstructedHm, typeof constructedHm>;
+    `;
+
+        describe('StateFromHandlerMap', () => {
+            it('correctly extracts the type from a given handler map', () => {
+                expect(getDiagnosticMessages(diagnostics)).toEqual([]);
+                expect(types['__StateConstructedHm']).toEqual(
+                    'string | number'
+                );
+                expect(types['__StateInferredHm']).toEqual('any');
+            });
+        });
+
+        describe('ActionsFromHandlerMap', () => {
+            it('extracts the right actions from a given handler map', () => {
+                expect(types['__Actions']).toEqual("{ type: \"FOO\"; } | { type: \"BAR\"; } | { type: \"SET\"; payload: number; } | { type: \"QUOX\"; payload: number; }");
+            });
         });
     });
 });

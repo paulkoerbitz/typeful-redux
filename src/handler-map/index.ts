@@ -1,5 +1,13 @@
 import { INITIAL_STATE_KEY } from '../constants';
-import { Arg1, Arg2 } from '../types/helpers';
+import {
+    Arg1,
+    Arg2,
+    IfArity2,
+    If,
+    Or,
+    Equals,
+    IfArity1
+} from '../types/helpers';
 
 export type NonObjectOrFunction =
     | string
@@ -38,10 +46,7 @@ export type HandlerMapConstraint<State> = {
 /**
  * Type-annotate a map from action names to handling functions
  */
-export const createHandlerMap = <
-    State,
-    HM extends HandlerMapConstraint<State>
->(
+export const createHandlerMap = <State, HM extends HandlerMapConstraint<State>>(
     initialState: State,
     handlerMap: HM
 ): HandlerMap<State, HM> => {
@@ -51,19 +56,35 @@ export const createHandlerMap = <
     } as any;
 };
 
-export type StateFromHandlerMap<HM extends HandlerMapConstraint<any>> =
-    HM extends HandlerMapConstraint<infer State> ? State : never;
+export type StateFromHandlerMap<
+    HM extends HandlerMapConstraint<any>
+> = HM extends HandlerMapConstraint<infer State> ? State : never;
 
-// export type ActionFromHandlerMapEntry<ActionName, HmEntry> = HmEntry extends (
-//     ...xs: any[]
-// ) => any
-//     ? ActionFromPayload<ActionName, Arg2<HmEntry>>
-//     : { type: ActionName };
+export type ActionFromPayload<
+    ActionName,
+    Payload extends string | void | object
+> = If<
+    Or<Equals<Payload, ActionName>, Equals<Payload, void>>,
+    { type: ActionName },
+    { type: ActionName; payload: Payload }
+>;
 
-// export type ActionsFromHandlerMap<State, HM extends HandlerMapConstraint<State>> = {
-//     [ActionName in keyof HM]: ActionFromHandlerMapEntry<
-//         ActionName,
-//         HM[ActionName]
-//     >
-// }[keyof HM];
+export type ActionFromHandlerMapEntry<
+    ActionName,
+    HmEntry extends HandlerMapValueConstraint<any>
+> = IfArity2<
+    HmEntry,
+    ActionFromPayload<ActionName, Arg2<HmEntry>>,
+    IfArity1<
+        HmEntry,
+        ActionFromPayload<ActionName, Arg1<HmEntry>>,
+        { type: ActionName }
+    >
+>;
 
+export type ActionsFromHandlerMap<State, HM extends HandlerMapConstraint<State>> = {
+    [ActionName in keyof HM]: ActionFromHandlerMapEntry<
+        ActionName,
+        HM[ActionName]
+    >
+}[keyof HM];
