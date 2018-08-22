@@ -19,25 +19,6 @@ export type BoundActionCreatorFromPayload<
     (payload: P) => void
 >;
 
-export type StateFromHandlerMap<
-    HandlerMap extends { [key in string]: (...xs: any[]) => any }
-> = {
-    [ActionName in keyof HandlerMap]: Arg1<HandlerMap[ActionName]>
-}[keyof HandlerMap];
-
-export type ActionFromHandlerMapEntry<ActionName, HmEntry> = HmEntry extends (
-    ...xs: any[]
-) => any
-    ? ActionFromPayload<ActionName, Arg2<HmEntry>>
-    : { type: ActionName };
-
-export type ActionsFromHandlerMap<State, HM extends HandlerMap<State>> = {
-    [ActionName in keyof HM]: ActionFromHandlerMapEntry<
-        ActionName,
-        HM[ActionName]
-    >
-}[keyof HM];
-
 export type ActionCreatorFromPayload<
     ActionName,
     Payload extends string | void | object
