@@ -1,4 +1,8 @@
-export type HasArity2<F, THEN, ELSE> = ((x1: any, x2: any) => any) extends F
+export type IfArity2<F, THEN, ELSE> = ((x1: any, x2: any) => any) extends F
+    ? THEN
+    : ELSE;
+
+export type IfArity1<F, THEN, ELSE> = ((x1: any) => any) extends F
     ? THEN
     : ELSE;
 
@@ -6,7 +10,7 @@ export type Arg1<F> = ((x1: any) => any) extends F
     ? F extends ((x1: infer X1, ...xs: any[]) => any) ? X1 : never
     : never;
 
-export type Arg2<F> = HasArity2<
+export type Arg2<F> = IfArity2<
     F,
     F extends ((x1: any, x2: infer X2, ...xs: any[]) => any) ? X2 : never,
     never

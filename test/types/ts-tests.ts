@@ -1,7 +1,7 @@
 import 'jest';
 import { resolveTypes } from 'resolve-types';
 
-describe('Type Operators', () => {
+describe.skip('Type Operators', () => {
     describe('Arg1', () => {
         const {
             types: { __1, __2, __3, __4 }
@@ -62,7 +62,7 @@ describe('Type Operators', () => {
     });
 });
 
-describe('Type Converters', () => {
+describe.skip('Type Converters', () => {
     describe('ActionsFromHandlerMap', () => {
         it('extracts a simple action', () => {
             const { types: { __1 } } = resolveTypes`

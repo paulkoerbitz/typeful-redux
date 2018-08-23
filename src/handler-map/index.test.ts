@@ -90,7 +90,7 @@ describe('Handler Map', () => {
                 type __nullarySetterHandlerMapType = typeof nullarySetterHandlerMap;
 
                 const unarySetterHandlerMap = createHandlerMap(initialState, {
-                    SET_QUOX: s => (s === ${foo} ? ${bar} : ${quox}),
+                    SET_QUOX: _s => (${foo}${returnTypeAnnotation})
                 });
                 type __unarySetterHandlerMapType = typeof unarySetterHandlerMap;
 

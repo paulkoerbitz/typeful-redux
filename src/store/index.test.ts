@@ -1,6 +1,6 @@
 import { createHandlerMap, createReducer, createStore, createActionCreators, combineReducers, bindActionCreators } from '..';
 
-describe.skip('createStore', () => {
+describe('createStore', () => {
     describe('created stores', () => {
         it('an empty store has a \'getState\', \'dispatch\' and \'subscribe\' method', () => {
             const store = createStore(createReducer(createHandlerMap(null, {})));
@@ -19,7 +19,7 @@ describe.skip('createStore', () => {
             const reducer = createReducer(createHandlerMap(0, {
                 increment: (s: number) => s + 1,
                 decrement: (s: number) => s - 1,
-                set: (_s: number, newValue: number) => newValue
+                set: (_s, newValue: number) => newValue
             }));
             const store = createStore(reducer);
 

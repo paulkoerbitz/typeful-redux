@@ -1,5 +1,6 @@
-import * as Redux from 'redux';
+import { Action, Dispatch } from '../types/redux';
 import { connect as redux_connect } from 'react-redux';
+import { Store } from '../store';
 
 export interface MapStateToProps<STATE, OWN_PROPS, PROPS_FROM_STATE> {
     (state: STATE, ownProps: OWN_PROPS): PROPS_FROM_STATE;
@@ -25,14 +26,14 @@ export interface MergeProps<
 export interface Connect {
     <
         State,
-        Action extends Redux.Action,
+        Action_ extends Action,
         OwnProps,
         PropsFromState,
         PropsFromDispatch
     >(
         mapStateToProps: MapStateToProps<State, OwnProps, PropsFromState>,
         mapDispatchToProps: MapDispatchToProps<
-            Redux.Dispatch<Action>,
+            Dispatch<Action_>,
             OwnProps,
             PropsFromDispatch
         >
@@ -40,11 +41,11 @@ export interface Connect {
         component: React.ComponentClass<
             PropsFromState & PropsFromDispatch & OwnProps
         >
-    ) => React.ComponentClass<OwnProps & { store: Store<State, Action> }>;
+    ) => React.ComponentClass<OwnProps & { store: Store<State, Action_> }>;
 
     <
         State,
-        Action extends Redux.Action,
+        Action_ extends Action,
         OwnProps,
         PropsFromState,
         PropsFromDispatch,
@@ -52,7 +53,7 @@ export interface Connect {
     >(
         mapStateToProps: MapStateToProps<State, OwnProps, PropsFromState>,
         mapDispatchToProps: MapDispatchToProps<
-            Redux.Dispatch<Action>,
+            Dispatch<Action_>,
             OwnProps,
             PropsFromDispatch
         >,
@@ -64,7 +65,7 @@ export interface Connect {
         >
     ): (
         component: React.ComponentClass<FinalProps>
-    ) => React.ComponentClass<OwnProps & { store: Store<State, Action> }>;
+    ) => React.ComponentClass<OwnProps & { store: Store<State, Action_> }>;
 }
 
 export const connect: Connect = redux_connect;

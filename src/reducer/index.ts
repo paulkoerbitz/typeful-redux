@@ -1,13 +1,11 @@
-import * as Redux from 'redux';
-import { Arg1, Arg2 } from '../types/helpers';
+import { combineReducers as redux_combineReducers } from 'redux';
+import { Action } from '../types/redux';
+import { Arg1, Arg2, If, Equals, IfArity2 } from '../types/helpers';
 import { ActionsFromHandlerMap, StateFromHandlerMap } from "../handler-map";
 import { INITIAL_STATE_KEY } from "../constants";
 import { HandlerMapConstraint } from '../handler-map';
 
-export type Reducer<State, Action extends Redux.Action> = Redux.Reducer<
-    State,
-    Action
->;
+export type Reducer<S, A extends Action> = (state: S | undefined, action: A) => S;
 
 export type ReducerMap = { [reducerName: string]: Reducer<any, any> };
 
@@ -50,5 +48,5 @@ export const createReducer = <
     };
 };
 
-export const combineReducers: CombineReducers = Redux.combineReducers;
+export const combineReducers: CombineReducers = redux_combineReducers;
 

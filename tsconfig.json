@@ -11,12 +11,12 @@
         "noImplicitThis": true,
         "alwaysStrict": true,
         /* Additional Checks */
-        "noUnusedLocals": true,
+        /* "noUnusedLocals": true, */
         "noUnusedParameters": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
         "outDir": "dist/",
-        "lib": ["es5", "dom"]
+        "lib": ["es5", "dom", "es2015.promise"]
     },
     "files": [
         "src/index.ts"

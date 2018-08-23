@@ -24,28 +24,33 @@
     "peerDependencies": {
         "react": ">=15.0.0",
         "react-redux": "5.x",
-        "redux": "^3.x"
+        "redux": "^4.x"
     },
     "devDependencies": {
         "@types/chai": "^4.0.4",
         "@types/jest": "^22.2.2",
-        "@types/react-redux": "^5.0.16",
-        "@types/redux": "^3.6.0",
+        "@types/react": "^16.4.11",
+        "@types/react-dom": "^16.0.7",
         "chai": "^4.1.2",
         "dts-bundle-generator": "^1.6.1",
         "jest": "^22.4.3",
         "mocha": "^4.0.1",
-        "react": "^16.3.1",
+        "react": "^16.4.2",
+        "react-dom": "^16.4.2",
         "react-redux": "^5.0.7",
-        "redux": "^3.x",
+        "redux": "^4.x",
+        "redux-thunk": "^2.3.0",
         "resolve-types": "^0.2.0",
         "ts-jest": "^22.4.2",
         "ts-node": "^3.3.0",
         "typedoc": "^0.9.0",
-        "typescript": "^2.8.1"
+        "typescript": "^2.8.1",
+        "webpack": "^4.16.5",
+        "webpack-serve": "^2.0.2"
     },
     "scripts": {
-        "build": "tsc && dts-bundle-generator -o dist/typeful-redux.d.ts dist/index.d.ts",
+        "build:typedef": "dts-bundle-generator -o dist/typeful-redux.d.ts --external-types redux react-redux -- dist/index.d.ts ",
+        "build": "tsc && npm run build:typedef",
         "test": "jest",
         "typecheck": "tsc -w --noEmit",
         "prepare": "npm run build"
@@ -55,7 +60,7 @@
         "transform": {
             "^.+\\.tsx?$": "ts-jest"
         },
-        "testRegex": "test/.*\\.tsx?$",
+        "testRegex": "(test/.*|src/.*\\.test)\\.tsx?$",
         "moduleFileExtensions": [
             "ts",
             "tsx",
@@ -64,5 +69,8 @@
             "json",
             "node"
         ]
+    },
+    "dependencies": {
+        "@types/react-redux": "^6.0.6"
     }
 }
