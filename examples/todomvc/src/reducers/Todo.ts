@@ -9,37 +9,37 @@ import { State, Dispatch } from '..';
 export interface TodoItem {
     task: string;
     completed: boolean;
+    isSaved: boolean;
 }
 
+const replace = <T>(array: ReadonlyArray<T>, idx: number, newValue?: T): T[] =>
+    (newValue == undefined)
+        ? [...array.slice(0, idx), ...array.slice(idx + 1)]
+        : [...array.slice(0, idx), newValue, ...array.slice(idx + 1)];
+
 const handler = createHandlerMap([] as TodoItem[], {
-    ADD_TODO: (s, task: string) => [...s, { task, completed: false }],
+    CREATE_TODO: (s, task: string) => [...s, { task, completed: false, isSaved: false }],
+    MARK_TODO_SAVED: (s, idx: number) => replace(s, idx, { ...s[idx], isSaved: true }),
     CLEAR_TODOS: [],
     CLEAR_COMPLETED: (s: TodoItem[]) => s.filter(item => !item.completed),
-    TOGGLE_TODO: (s, idx: number) => [
-        ...s.slice(0, idx),
-        { task: s[idx].task, completed: !s[idx].completed },
-        ...s.slice(idx + 1)
-    ],
-    EDIT_TODO: (s, p: { idx: number; task: string }) => [
-        ...s.slice(0, p.idx),
-        { ...s[p.idx], task: p.task },
-        ...s.slice(p.idx + 1)
-    ],
-    REMOVE_TODO: (s, idx: number) => [...s.slice(0, idx), ...s.slice(idx + 1)]
+    TOGGLE_TODO: (s, idx: number) => replace(s, idx, { ...s[idx], completed: !s[idx].completed }),
+    EDIT_TODO: (s, p: { idx: number; task: string }) =>
+        replace(s, p.idx, { ...s[p.idx], task: p.task }),
+    REMOVE_TODO: (s, idx: number) => replace(s, idx)
 });
 
 const delay = (timeInMs: number) =>
     new Promise(resolve => setTimeout(resolve, timeInMs));
 
 const thunks = {
-    ADD_TODO_DELAYED: (task: string) => async (
+    ADD_TODO: (task: string) => async (
         dispatch: Dispatch,
         getState: () => State
     ) => {
-        await delay(400);
-        const state = getState();
-        state;
-        dispatch(actionCreators.ADD_TODO(task));
+        dispatch(actionCreators.CREATE_TODO(task));
+        const idx = getState().todos.length - 1;
+        await delay(1000);
+        dispatch(actionCreators.MARK_TODO_SAVED(idx));
     }
 };
 

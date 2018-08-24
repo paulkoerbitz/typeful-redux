@@ -16,9 +16,10 @@ export class TodoListComponent extends React.Component<TodoListProps> {
 
     private handleSubmit = async (e: React.FormEvent<any>) => {
         e.preventDefault();
-        if (this.input != null) {
-            await this.props.ADD_TODO_DELAYED(this.input.value);
+        if (this.input != null && this.input.value !== '') {
+            const value = this.input.value;
             this.input.value = '';
+            await this.props.ADD_TODO(value);
         }
     };
 

@@ -38,6 +38,8 @@ export class TodoComponent extends React.Component<TodoProps, TodoState> {
             (item.completed ? "completed" : "") +
             (this.state.editedTask != undefined ? " editing" : "");
 
+        const savingIndicatorOpacity = item.isSaved ? 0 : 0.4;
+
         return (
             <li className={liClass}>
                 <div className="view">
@@ -48,6 +50,7 @@ export class TodoComponent extends React.Component<TodoProps, TodoState> {
                         onClick={toggle}
                     />
                     <label onDoubleClick={this.edit}>{this.props.item.task}</label>
+                    <span style={{ position: "absolute", top: "20px", right: "30px", font: "14px italic", opacity: savingIndicatorOpacity, transition: "opacity 0.4s ease-in-out" }}>Saving...</span>
                     <button className="destroy" onClick={this.props.delete} />
                 </div>
                 <input
