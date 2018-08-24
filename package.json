@@ -54,7 +54,8 @@
         "test": "jest",
         "typecheck": "tsc -w --noEmit",
         "prepare": "npm run build",
-        "start:todomvc": "cd examples/todomvc && webpack-serve --config webpack.config.js"
+        "start:simple-todo": "cd examples/simple-todo && webpack-serve",
+        "start:todomvc": "cd examples/todomvc && webpack-serve"
     },
     "jest": {
         "testURL": "http://localhost/",
