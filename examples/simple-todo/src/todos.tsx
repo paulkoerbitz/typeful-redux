@@ -2,11 +2,11 @@ import * as React from 'react';
 import { render } from 'react-dom';
 import {
     createReducer,
-    combineReducers,
     createStore,
     createActionCreators,
     bindActionCreators,
-    connect
+    connect,
+    createHandlerMap
 } from '../../../src';
 
 interface TodoItem {
@@ -14,17 +14,17 @@ interface TodoItem {
     completed: boolean;
 }
 
-const TodoHandlers = {
-    ADD: (s: TodoItem[], task: string) => [...s, { task, completed: false }],
-    CLEAR: (_s: TodoItem[]) => [] as TodoItem[],
-    TOGGLE: (s: TodoItem[], idx: number) => [
+const TodoHandlers = createHandlerMap([] as TodoItem[], {
+    ADD: (s, task: string) => [...s, { task, completed: false }],
+    CLEAR: [],
+    TOGGLE: (s, idx: number) => [
         ...s.slice(0, idx),
         { task: s[idx].task, completed: !s[idx].completed },
         ...s.slice(idx + 1)
     ]
-};
+});
 
-const TodoReducer = createReducer([], TodoHandlers);
+const TodoReducer = createReducer(TodoHandlers);
 
 const store = createStore(TodoReducer);
 

@@ -15,10 +15,13 @@
         "noUnusedParameters": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
+        "noErrorTruncation": true,
         "outDir": "dist/",
+        "jsx": "react",
         "lib": ["es5", "dom", "es2015.promise"]
     },
     "files": [
-        "src/index.ts"
+        "src/index.ts",
+	    "examples/todomvc/src/index.tsx"
     ]
 }

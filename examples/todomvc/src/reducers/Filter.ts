@@ -1,15 +1,20 @@
-import { createReducer, createActionCreators, BoundCreatorsFromActionCreators } from '../../../../src';
+ import {
+    createHandlerMap,
+    createReducer,
+    createActionCreators,
+    BoundCreatorsFromActionCreators
+} from '../../../../src';
 
 export type FilterType = 'all' | 'active' | 'completed';
 
-const initialState: FilterType = 'all';
+const initialState = 'all' as FilterType;
 
-const handler = {
-    FILTER_ALL: (_s: FilterType) => 'all',
-    FILTER_ACTIVE: (_s: FilterType) => 'active',
-    FILTER_COMPLETED: (_s: FilterType) => 'completed'
-};
+const handler = createHandlerMap(initialState, {
+    FILTER_ALL: 'all',
+    FILTER_ACTIVE: 'active',
+    FILTER_COMPLETED: 'completed'
+});
 
-export const reducer = createReducer(initialState, handler);
+export const reducer = createReducer(handler);
 export const actionCreators = createActionCreators(handler);
 export type Dispatch = BoundCreatorsFromActionCreators<typeof actionCreators>;

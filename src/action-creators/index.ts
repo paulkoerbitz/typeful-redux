@@ -2,14 +2,13 @@ import { Arg1, Arg2, Equals, If, Or } from '../types/helpers';
 import { HandlerMap, ActionFromPayload } from "../handler-map";
 
 export const createActionCreators = <
-    State,
-    HM extends HandlerMap<State, HM>
+    HM extends HandlerMap<any, HM>
 >(
     handlerMap: HM
-): ActionCreatorsFromHandlerMap<State, HM> => {
+): ActionCreatorsFromHandlerMap<HM> => {
     const result: any = {};
     for (const type in handlerMap) {
-        if (!handlerMap.hasOwnProperty(type)) {
+         if (!handlerMap.hasOwnProperty(type)) {
             continue;
         }
         result[type] = (payload: any) => ({ type, payload });
@@ -60,8 +59,7 @@ export type ActionCreatorFromHandlerMapEntry<
     : (() => { type: ActionName });
 
 export type ActionCreatorsFromHandlerMap<
-    State,
-    HM extends HandlerMap<State, HM>
+    HM extends HandlerMap<any, HM>
 > = {
     [ActionName in keyof HM]: ActionCreatorFromHandlerMapEntry<
         ActionName,
