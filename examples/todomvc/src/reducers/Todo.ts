@@ -36,7 +36,7 @@ const thunks = {
         dispatch: Dispatch,
         getState: () => State
     ) => {
-        await delay(1000);
+        await delay(400);
         const state = getState();
         state;
         dispatch(actionCreators.ADD_TODO(task));

@@ -313,16 +313,16 @@ export interface MiddlewareAPI<D extends Dispatch, S> {
  * @template D The type of Dispatch of the store where this middleware is
  *   installed.
  */
-export interface Middleware<
-    DispatchExt,
-    S,
-    A extends Action,
-    D extends Dispatch<A> & Dispatch<AnyAction>
-> {
-    (api: MiddlewareAPI<D, S>): (
-        next: Dispatch<AnyAction>
-    ) => (action: any) => any;
-}
+// export interface Middleware<
+//     DispatchExt,
+//     S,
+//     A extends Action,
+//     D extends Dispatch<A> & Dispatch<AnyAction>
+// > {
+//     (api: MiddlewareAPI<D, S>): (
+//         next: Dispatch<AnyAction>
+//     ) => (action: any) => any;
+// }
 
 /**
  * Creates a store enhancer that applies middleware to the dispatch method
@@ -344,18 +344,18 @@ export interface Middleware<
  * @template Ext Dispatch signature added by a middleware.
  * @template S The type of the state supported by a middleware.
  */
-export interface ApplyMiddleware {
-    // (): StoreEnhancer;
-    <Ext1, S, A extends Action, D extends Dispatch<A> & Dispatch<AnyAction>>(
-        middleware1: Middleware<Ext1, S, A, D>
-    ): StoreEnhancer<
-        {
-            dispatch: Ext1;
-        },
-        {},
-        S,
-        A
-    >;
+// export interface ApplyMiddleware {
+//     // (): StoreEnhancer;
+//     <Ext1, S, A extends Action, D extends Dispatch<A> & Dispatch<AnyAction>>(
+//         middleware1: Middleware<Ext1, S, A, D>
+//     ): StoreEnhancer<
+//         {
+//             dispatch: Ext1;
+//         },
+//         {},
+//         S,
+//         A
+//     >;
     // <Ext1, Ext2, S>(
     //     middleware1: Middleware<Ext1, S, any>,
     //     middleware2: Middleware<Ext2, S, any>
@@ -381,7 +381,7 @@ export interface ApplyMiddleware {
     // <Ext, S = any>(...middlewares: Middleware<any, S, any>[]): StoreEnhancer<{
     //     dispatch: Ext;
     // }>;
-}
+// }
 
 /* action creators */
 
@@ -402,32 +402,32 @@ export interface ApplyMiddleware {
  *
  * @template A Returned action type.
  */
-export interface ActionCreator<A> {
-    (...args: any[]): A;
-}
+// export interface ActionCreator<A> {
+//     (...args: any[]): A;
+// }
 
-/**
- * Object whose values are action creator functions.
- */
-export interface ActionCreatorsMapObject<A = any> {
-    [key: string]: ActionCreator<A>;
-}
+// /**
+//  * Object whose values are action creator functions.
+//  */
+// export interface ActionCreatorsMapObject<A = any> {
+//     [key: string]: ActionCreator<A>;
+// }
 
-// import { Middleware, Action, AnyAction } from "redux";
+// // import { Middleware, Action, AnyAction } from "redux";
 
-export interface ThunkDispatch<S, E, A extends Action> {
-    <T extends A>(action: T): T;
-    <R>(asyncAction: ThunkAction<R, S, E, A>): R;
-}
+// export interface ThunkDispatch<S, E, A extends Action> {
+//     <T extends A>(action: T): T;
+//     <R>(asyncAction: ThunkAction<R, S, E, A>): R;
+// }
 
-export type ThunkAction<R, S, E, A extends Action> = (
-    dispatch: ThunkDispatch<S, E, A>,
-    getState: () => S,
-    extraArgument: E
-) => R;
+// export type ThunkAction<R, S, E, A extends Action> = (
+//     dispatch: ThunkDispatch<S, E, A>,
+//     getState: () => S,
+//     extraArgument: E
+// ) => R;
 
-// export interface ThunkMiddleware {
-//     <S, E, A>Middleware<ThunkDispatch<S, E, A>, S, A, ThunkDispatch<S, E, A> >;
+// // export interface ThunkMiddleware {
+// //     <S, E, A>Middleware<ThunkDispatch<S, E, A>, S, A, ThunkDispatch<S, E, A> >;
 //     withExtraArgument<S, E, A extends Action>(extraArgument: E): ThunkMiddleware<{}, A, E>;
 // };
 

@@ -14,10 +14,10 @@ export type TodoListProps = {
 export class TodoListComponent extends React.Component<TodoListProps> {
     private input: HTMLInputElement | null = null;
 
-    private handleSubmit = (e: React.FormEvent<any>) => {
+    private handleSubmit = async (e: React.FormEvent<any>) => {
         e.preventDefault();
         if (this.input != null) {
-            this.props.ADD_TODO(this.input.value);
+            await this.props.ADD_TODO_DELAYED(this.input.value);
             this.input.value = '';
         }
     };
@@ -33,7 +33,7 @@ export class TodoListComponent extends React.Component<TodoListProps> {
             filter,
             FILTER_ALL,
             FILTER_ACTIVE,
-            FILTER_COMPLETED
+            FILTER_COMPLETED,
         } = this.props;
 
         const visible =

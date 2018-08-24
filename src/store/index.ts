@@ -1,6 +1,6 @@
 import * as Redux from 'redux';
 import * as Thunk from 'redux-thunk';
-import { Action, Dispatch, ApplyMiddleware } from '../types/redux';
+import { Action, Dispatch } from '../types/redux';
 import { Reducer } from '../reducer';
 
 /**
