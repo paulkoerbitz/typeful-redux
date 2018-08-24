@@ -1,14 +1,13 @@
-import { Arg1, Arg2, Equals, If, Or } from '../types/helpers';
-import { HandlerMap, ActionFromPayload } from "../handler-map";
+import { Arg1, Arg2, Equals, If, Or, ReplaceReturnType } from '../types/helpers';
+import { Dispatch } from '../types/redux';
+import { HandlerMap, ActionFromPayload } from '../handler-map';
 
-export const createActionCreators = <
-    HM extends HandlerMap<any, HM>
->(
+export const createActionCreators = <HM extends HandlerMap<any, HM>>(
     handlerMap: HM
 ): ActionCreatorsFromHandlerMap<HM> => {
     const result: any = {};
     for (const type in handlerMap) {
-         if (!handlerMap.hasOwnProperty(type)) {
+        if (!handlerMap.hasOwnProperty(type)) {
             continue;
         }
         result[type] = (payload: any) => ({ type, payload });
@@ -16,11 +15,15 @@ export const createActionCreators = <
     return result;
 };
 
+export type ActionCreatorsConstraint = {
+    [key: string]: ((...xs: any[]) => any);
+};
+
 export const bindActionCreators = <
-    ActionCreators extends { [key: string]: string | void | object }
+    ActionCreators extends ActionCreatorsConstraint
 >(
     actionCreators: ActionCreators,
-    dispatch: (action: ActionsFromActionCreators<ActionCreators>) => void
+    dispatch: Dispatch<ActionsFromActionCreators<ActionCreators>>
 ): BoundCreatorsFromActionCreators<ActionCreators> => {
     const result = {} as any;
     for (const key in actionCreators) {
@@ -58,27 +61,24 @@ export type ActionCreatorFromHandlerMapEntry<
     ? ActionCreatorFromPayload<ActionName, Arg2<HmEntry>>
     : (() => { type: ActionName });
 
-export type ActionCreatorsFromHandlerMap<
-    HM extends HandlerMap<any, HM>
-> = {
+export type ActionCreatorsFromHandlerMap<HM extends HandlerMap<any, HM>> = {
     [ActionName in keyof HM]: ActionCreatorFromHandlerMapEntry<
         ActionName,
         HM[ActionName]
     >
 };
 
-export type ActionsFromActionCreators<ActionCreators> = {
-    [ActionName in keyof ActionCreators]: ActionFromPayload<
-        ActionName,
-        Arg1<ActionCreators[ActionName]>
-    >
+export type ActionsFromActionCreators<
+    ActionCreators extends ActionCreatorsConstraint
+> = {
+    [ActionName in keyof ActionCreators]: ReturnType<ActionCreators[ActionName]>
 }[keyof ActionCreators];
 
 export type BoundCreatorsFromActionCreators<
-    ActionCreators extends { [key: string]: string | void | object }
+    ActionCreators extends ActionCreatorsConstraint
 > = {
-    [ActionName in keyof ActionCreators]: BoundActionCreatorFromPayload<
-        ActionName,
-        Arg1<ActionCreators[ActionName]>
+    [ActionName in keyof ActionCreators]: ReplaceReturnType<
+        ActionCreators[ActionName],
+        void
     >
 };

@@ -44,7 +44,7 @@
         "ts-jest": "^22.4.2",
         "ts-node": "^3.3.0",
         "typedoc": "^0.9.0",
-        "typescript": "^2.8.1",
+        "typescript": "^3.0.1",
         "webpack": "^4.16.5",
         "webpack-serve": "^2.0.2"
     },

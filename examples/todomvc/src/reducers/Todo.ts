@@ -46,7 +46,7 @@ const thunks = {
 export const reducer = createReducer(handler);
 export const actionCreators = {
     ...createActionCreators(handler),
-    // ...thunks
+    ...thunks
 };
 
 export type Dispatch = BoundCreatorsFromActionCreators<typeof actionCreators>;

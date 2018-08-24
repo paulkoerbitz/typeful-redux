@@ -206,7 +206,7 @@ export interface Store<S = any, A extends Action = AnyAction> {
     replaceReducer(nextReducer: Reducer<S, A>): void;
 }
 
-export type DeepPartial<T> = { [K in keyof T]?: DeepPartial<T[K]> };
+// export type DeepPartial<T> = { [K in keyof T]?: DeepPartial<T[K]> };
 
 /**
  * A store creator is a function that creates a Redux store. Like with
@@ -222,13 +222,13 @@ export type DeepPartial<T> = { [K in keyof T]?: DeepPartial<T[K]> };
 export interface StoreCreator {
     <S, A extends Action, Ext, StateExt>(
         reducer: Reducer<S, A>,
-        enhancer?: StoreEnhancer<Ext, StateExt>
+        enhancer: StoreEnhancer<Ext, StateExt, S, A>
     ): Store<S & StateExt, A> & Ext;
-    <S, A extends Action, Ext, StateExt>(
-        reducer: Reducer<S, A>,
-        preloadedState: DeepPartial<S>,
-        enhancer?: StoreEnhancer<Ext>
-    ): Store<S & StateExt> & Ext;
+    // <S, A extends Action, Ext, StateExt>(
+    //     reducer: Reducer<S, A>,
+    //     preloadedState: DeepPartial<S>,
+    //     enhancer?: StoreEnhancer<Ext, StateExt, S, A>
+    // ): Store<S & StateExt> & Ext;
 }
 
 /**
@@ -282,20 +282,19 @@ export interface StoreCreator {
  * @template Ext Store extension that is mixed into the Store type.
  * @template StateExt State extension that is mixed into the state type.
  */
-export type StoreEnhancer<Ext = {}, StateExt = {}> = (
-    next: StoreEnhancerStoreCreator
-) => StoreEnhancerStoreCreator<Ext, StateExt>;
-export type StoreEnhancerStoreCreator<Ext = {}, StateExt = {}> = <
-    S = any,
-    A extends Action = AnyAction
->(
-    reducer: Reducer<S, A>,
-    preloadedState?: DeepPartial<S>
-) => Store<S & StateExt, A> & Ext;
+export type StoreEnhancer<Ext, StateExt, S, A extends Action> = (
+    next: StoreEnhancerStoreCreator<{}, {}, S, A>
+) => StoreEnhancerStoreCreator<Ext, StateExt, S, A>;
+
+export type StoreEnhancerStoreCreator<Ext, StateExt, S, A extends Action> = (
+    reducer: Reducer<S, A>
+) => // ,
+// preloadedState?: DeepPartial<S>
+Store<S & StateExt, A> & Ext;
 
 /* middleware */
 
-export interface MiddlewareAPI<D extends Dispatch = Dispatch, S = any> {
+export interface MiddlewareAPI<D extends Dispatch, S> {
     dispatch: D;
     getState(): S;
 }
@@ -314,15 +313,16 @@ export interface MiddlewareAPI<D extends Dispatch = Dispatch, S = any> {
  * @template D The type of Dispatch of the store where this middleware is
  *   installed.
  */
-// export interface Middleware<
-//     DispatchExt = {},
-//     S = any,
-//     D extends Dispatch = Dispatch
-// > {
-//     (api: MiddlewareAPI<D, S>): (
-//         next: Dispatch<AnyAction>
-//     ) => (action: any) => any;
-// }
+export interface Middleware<
+    DispatchExt,
+    S,
+    A extends Action,
+    D extends Dispatch<A> & Dispatch<AnyAction>
+> {
+    (api: MiddlewareAPI<D, S>): (
+        next: Dispatch<AnyAction>
+    ) => (action: any) => any;
+}
 
 /**
  * Creates a store enhancer that applies middleware to the dispatch method
@@ -344,13 +344,44 @@ export interface MiddlewareAPI<D extends Dispatch = Dispatch, S = any> {
  * @template Ext Dispatch signature added by a middleware.
  * @template S The type of the state supported by a middleware.
  */
-//   export function applyMiddleware(): StoreEnhancer;
-//   export function applyMiddleware<Ext1, S>(middleware1: Middleware<Ext1, S, any>): StoreEnhancer<{dispatch: Ext1}>;
-//   export function applyMiddleware<Ext1, Ext2, S>(middleware1: Middleware<Ext1, S, any>, middleware2: Middleware<Ext2, S, any>): StoreEnhancer<{dispatch: Ext1 & Ext2}>;
-//   export function applyMiddleware<Ext1, Ext2, Ext3, S>(middleware1: Middleware<Ext1, S, any>, middleware2: Middleware<Ext2, S, any>, middleware3: Middleware<Ext3, S, any>): StoreEnhancer<{dispatch: Ext1 & Ext2 & Ext3}>;
-//   export function applyMiddleware<Ext1, Ext2, Ext3, Ext4, S>(middleware1: Middleware<Ext1, S, any>, middleware2: Middleware<Ext2, S, any>, middleware3: Middleware<Ext3, S, any>, middleware4: Middleware<Ext4, S, any>): StoreEnhancer<{dispatch: Ext1 & Ext2 & Ext3 & Ext4}>;
-//   export function applyMiddleware<Ext1, Ext2, Ext3, Ext4, Ext5, S>(middleware1: Middleware<Ext1, S, any>, middleware2: Middleware<Ext2, S, any>, middleware3: Middleware<Ext3, S, any>, middleware4: Middleware<Ext4, S, any>, middleware5: Middleware<Ext5, S, any>): StoreEnhancer<{dispatch: Ext1 & Ext2 & Ext3 & Ext4 & Ext5}>;
-//   export function applyMiddleware<Ext, S = any>(...middlewares: Middleware<any, S, any>[]): StoreEnhancer<{dispatch: Ext}>;
+export interface ApplyMiddleware {
+    // (): StoreEnhancer;
+    <Ext1, S, A extends Action, D extends Dispatch<A> & Dispatch<AnyAction>>(
+        middleware1: Middleware<Ext1, S, A, D>
+    ): StoreEnhancer<
+        {
+            dispatch: Ext1;
+        },
+        {},
+        S,
+        A
+    >;
+    // <Ext1, Ext2, S>(
+    //     middleware1: Middleware<Ext1, S, any>,
+    //     middleware2: Middleware<Ext2, S, any>
+    // ): StoreEnhancer<{ dispatch: Ext1 & Ext2 }>;
+    // <Ext1, Ext2, Ext3, S>(
+    //     middleware1: Middleware<Ext1, S, any>,
+    //     middleware2: Middleware<Ext2, S, any>,
+    //     middleware3: Middleware<Ext3, S, any>
+    // ): StoreEnhancer<{ dispatch: Ext1 & Ext2 & Ext3 }>;
+    // <Ext1, Ext2, Ext3, Ext4, S>(
+    //     middleware1: Middleware<Ext1, S, any>,
+    //     middleware2: Middleware<Ext2, S, any>,
+    //     middleware3: Middleware<Ext3, S, any>,
+    //     middleware4: Middleware<Ext4, S, any>
+    // ): StoreEnhancer<{ dispatch: Ext1 & Ext2 & Ext3 & Ext4 }>;
+    // <Ext1, Ext2, Ext3, Ext4, Ext5, S>(
+    //     middleware1: Middleware<Ext1, S, any>,
+    //     middleware2: Middleware<Ext2, S, any>,
+    //     middleware3: Middleware<Ext3, S, any>,
+    //     middleware4: Middleware<Ext4, S, any>,
+    //     middleware5: Middleware<Ext5, S, any>
+    // ): StoreEnhancer<{ dispatch: Ext1 & Ext2 & Ext3 & Ext4 & Ext5 }>;
+    // <Ext, S = any>(...middlewares: Middleware<any, S, any>[]): StoreEnhancer<{
+    //     dispatch: Ext;
+    // }>;
+}
 
 /* action creators */
 
@@ -381,3 +412,25 @@ export interface ActionCreator<A> {
 export interface ActionCreatorsMapObject<A = any> {
     [key: string]: ActionCreator<A>;
 }
+
+// import { Middleware, Action, AnyAction } from "redux";
+
+export interface ThunkDispatch<S, E, A extends Action> {
+    <T extends A>(action: T): T;
+    <R>(asyncAction: ThunkAction<R, S, E, A>): R;
+}
+
+export type ThunkAction<R, S, E, A extends Action> = (
+    dispatch: ThunkDispatch<S, E, A>,
+    getState: () => S,
+    extraArgument: E
+) => R;
+
+// export interface ThunkMiddleware {
+//     <S, E, A>Middleware<ThunkDispatch<S, E, A>, S, A, ThunkDispatch<S, E, A> >;
+//     withExtraArgument<S, E, A extends Action>(extraArgument: E): ThunkMiddleware<{}, A, E>;
+// };
+
+// declare const thunk: ThunkMiddleware;
+
+// export default thunk;

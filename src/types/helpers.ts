@@ -57,3 +57,11 @@ export type NoInfer<T> = T & { [K in keyof T]: T[K] };
 export type Exactify<T, X extends T> = T & {
     [K in keyof X]: K extends keyof T ? X[K] : never
 }
+
+export type NonPartial<T> = { [KEY in keyof T]-?: T[KEY]; };
+
+export type GetArgumentsTupleType<F extends (...xs: any[]) => any> =
+    F extends ((...rest: infer ARGS) => any) ? ARGS : never;
+
+export type ReplaceReturnType<F extends (...xs: any[]) => any, NewReturnType> =
+    (...xs: GetArgumentsTupleType<F>) => NewReturnType;

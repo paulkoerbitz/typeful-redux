@@ -1,11 +1,11 @@
 import { combineReducers as redux_combineReducers } from 'redux';
-import { Action } from '../types/redux';
-import { Arg1, Arg2, If, Equals, IfArity2 } from '../types/helpers';
+import { Action, Dispatch } from '../types/redux';
+import { Arg1, Arg2, If, Equals, IfArity2, NonPartial } from '../types/helpers';
 import { ActionsFromHandlerMap, StateFromHandlerMap } from '../handler-map';
 import { INITIAL_STATE_KEY } from '../constants';
 import { HandlerMapConstraint } from '../handler-map';
 
-export type Reducer<S, A extends Action> = (
+export type Reducer<S, A> = (
     state: S | undefined,
     action: A
 ) => S;
@@ -40,9 +40,14 @@ export const createReducer = <HM extends HandlerMapConstraint<any>>(
     };
 };
 
-export type ReducersMapObject<S, A extends Action> = {
-    [K in keyof S]: Reducer<S[K], A>
-};
+// export interface CombineReducers {
+//     <RM extends ReducerMap>(reducers: RM): Reducer<
+//         { [Name in keyof RM]: Arg1<RM[Name]> },
+//         { [Name in keyof RM]: Arg2<RM[Name]> }[keyof RM]
+//     >;
+// }
+
+export type ReducersMapObject<S = any> = { [K in keyof S]: Reducer<S[K], Action> };
 
 /**
  * Turns an object whose values are different reducer functions, into a single
@@ -63,8 +68,32 @@ export type ReducersMapObject<S, A extends Action> = {
  *   object, and builds a state object with the same shape.
  */
 interface CombineReducers {
-    <S, A extends Action>(reducers: ReducersMapObject<S, A>): Reducer<S, A>;
+    <RM extends ReducersMapObject>(reducers: RM): Reducer<
+        { [K in keyof RM]: StateFromReducer<RM[K]>; },
+        { [K in keyof RM]: Arg2<RM[K]> }[keyof RM]
+    >;
 }
 
 export const combineReducers: CombineReducers = redux_combineReducers;
 
+export type StateFromReducer<R extends Reducer<any, any>> = R extends Reducer<
+    infer S,
+    any
+>
+    ? S
+    : never;
+
+export type ActionsFromReducer<R extends Reducer<any, any>> = R extends Reducer<
+    any,
+    infer A
+>
+    ? A
+    : never;
+
+/**
+ * Type of dispatch function that a store created with this
+ * reducer would have.
+ */
+export type DispatchFromReducer<R extends Reducer<any, any>> = Dispatch<
+    ActionsFromReducer<R>
+>;
