@@ -23,7 +23,7 @@ const todoHandler = {
     ADD: (state: Todo[], newTodo: Todo) => [...state, newItem],
     TOGGLE: (state: Todo[], index: number) => [
         ...state.slice(0, index),
-        { state[index], completed: !state[index].completed },
+        { task: state[index].task, completed: !state[index].completed },
         ...state.slice(index + 1)
     ]
 };
